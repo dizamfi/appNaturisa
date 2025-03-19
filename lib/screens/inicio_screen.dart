@@ -1,5 +1,7 @@
 import 'package:appnaturisa/providers/navigation_provider.dart';
+import 'package:appnaturisa/screens/camaroneras_screen.dart';
 import 'package:appnaturisa/screens/cerrar_sesion_screen.dart';
+import 'package:appnaturisa/screens/inicio_camaroneras_screens.dart';
 import 'package:appnaturisa/screens/josefina/historial_screen.dart';
 import 'package:appnaturisa/screens/josefina/home_screen.dart';
 import 'package:appnaturisa/screens/josefina/monitoreo_screen.dart';
@@ -23,17 +25,19 @@ class InicioScreen extends StatelessWidget {
 
     return WillPopScope(
       onWillPop: () async {
-        Navigator.push(
+        // Resetear el índice globalmente
+        NavigationProvider.resetToHome();
+
+        Navigator.pushReplacement(
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                const CerrarSesionScreen(),
+                const InicioCamaronerasScreen(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
-              // Usar CurvedAnimation para personalizar la curva y duración
               final fadeAnimation = CurvedAnimation(
                 parent: animation,
-                curve: Curves.easeInOut, // Puedes probar diferentes curvas
+                curve: Curves.easeInOut,
               );
 
               return FadeTransition(
@@ -41,8 +45,7 @@ class InicioScreen extends StatelessWidget {
                 child: child,
               );
             },
-            transitionDuration:
-                const Duration(milliseconds: 250), // Duración de la transición
+            transitionDuration: const Duration(milliseconds: 250),
           ),
         );
         return true;
@@ -68,35 +71,37 @@ class InicioScreen extends StatelessWidget {
               height: 1,
               color: Colors.grey[300],
             ),
+            // Reemplazo del BottomAppBar para mejor alineación
             BottomAppBar(
-              // elevation: 5,
-              // shape: const CircularNotchedRectangle(),
               color: Colors.transparent,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildNavItem(
-                    icon: Icons.home,
-                    label: 'Inicio',
-                    index: 0,
-                    selectedIndex: navigationProvider.selectedIndex,
-                    onTap: navigationProvider.setSelectedIndex,
-                  ),
-                  _buildNavItem(
-                    icon: FontAwesomeIcons.gears,
-                    label: 'Monitoreo',
-                    index: 1,
-                    selectedIndex: navigationProvider.selectedIndex,
-                    onTap: navigationProvider.setSelectedIndex,
-                  ),
-                  _buildNavItem(
-                    icon: Icons.person,
-                    label: 'Perfil',
-                    index: 2,
-                    selectedIndex: navigationProvider.selectedIndex,
-                    onTap: navigationProvider.setSelectedIndex,
-                  ),
-                ],
+              elevation: 0,
+              child: SizedBox(
+                height: 60, // Altura fija para el contenedor
+                child: Row(
+                  children: [
+                    _buildNavItem(
+                      icon: Icons.home,
+                      label: 'Inicio',
+                      index: 0,
+                      selectedIndex: navigationProvider.selectedIndex,
+                      onTap: navigationProvider.setSelectedIndex,
+                    ),
+                    _buildNavItem(
+                      icon: FontAwesomeIcons.gears,
+                      label: 'Monitoreo',
+                      index: 1,
+                      selectedIndex: navigationProvider.selectedIndex,
+                      onTap: navigationProvider.setSelectedIndex,
+                    ),
+                    _buildNavItem(
+                      icon: Icons.history,
+                      label: 'Historial',
+                      index: 2,
+                      selectedIndex: navigationProvider.selectedIndex,
+                      onTap: navigationProvider.setSelectedIndex,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -113,37 +118,39 @@ class InicioScreen extends StatelessWidget {
     required int selectedIndex,
     required Function(int) onTap,
   }) {
-    return InkWell(
-      onTap: () => onTap(index), // Detecta el toque de forma precisa
-      borderRadius:
-          BorderRadius.circular(8), // Añade un borde redondeado opcional
-      splashColor: Colors.transparent, // Elimina el efecto de splash
-      highlightColor: Colors.transparent, // Elimina el efecto de highlight
-      hoverColor: Colors.transparent, // Elimina el efecto de hover
-      focusColor: Colors.transparent, // Elimina el efecto de focus
-      child: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 18), // Ajustar el padding
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            FaIcon(
-              icon,
-              color: selectedIndex == index
-                  ? const Color.fromARGB(255, 4, 63, 122)
-                  : const Color.fromARGB(255, 143, 143, 143), // Color del ícono
-            ),
-            const SizedBox(height: 4), // Ajustar la separación
-            Text(
-              label,
-              style: TextStyle(
-                color: selectedIndex == index
-                    ? const Color.fromARGB(255, 4, 63, 122)
-                    : const Color.fromARGB(
-                        255, 143, 143, 143), // Color del texto
+    final bool isSelected = selectedIndex == index;
+    final Color activeColor = const Color.fromARGB(255, 4, 63, 122);
+    final Color inactiveColor = const Color.fromARGB(255, 143, 143, 143);
+
+    return Expanded(
+      // Usar Expanded para distribuir uniformemente
+      child: InkWell(
+        onTap: () => onTap(index),
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+        focusColor: Colors.transparent,
+        child: SizedBox(
+          height: 60, // Altura fija para asegurar consistencia
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center, // Centro vertical
+            children: [
+              FaIcon(
+                icon,
+                color: isSelected ? activeColor : inactiveColor,
+                size: 22, // Tamaño consistente
               ),
-            ),
-          ],
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? activeColor : inactiveColor,
+                  // fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

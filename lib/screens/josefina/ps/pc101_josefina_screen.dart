@@ -1,5 +1,6 @@
 import 'package:appnaturisa/providers/ps_josefina_provider.dart';
 import 'package:appnaturisa/screens/josefina/ps/help_piscina_josefina_screen.dart';
+import 'package:appnaturisa/utils/data_access_utils.dart'; // Importación añadida
 import 'package:appnaturisa/widgets/card_tablero_aire.dart';
 import 'package:appnaturisa/widgets/control_remoto.dart';
 import 'package:appnaturisa/widgets/headers.dart';
@@ -17,7 +18,7 @@ class PC101JosefinaScreen extends StatefulWidget {
 
 class _PC101JosefinaScreenState extends State<PC101JosefinaScreen>
     with WidgetsBindingObserver {
-  // List<dynamic> apiDataList = [];
+  List<dynamic> apiDataList = [];
   bool firstLoad = true;
 
   @override
@@ -29,10 +30,10 @@ class _PC101JosefinaScreenState extends State<PC101JosefinaScreen>
       Provider.of<PiscinasJosefinaProvider>(context, listen: false)
           .reconnectIfNeeded();
       if (firstLoad) {
-        // Espera a que el canal WebSocket esté inicializado
         if (PiscinasJosefinaProvider.channel != null) {
           Provider.of<PiscinasJosefinaProvider>(context, listen: false)
               .subscribePC101();
+          debugPrint('[PC101] Suscripción inicial realizada');
         }
         setState(() {
           firstLoad = false;
@@ -44,8 +45,6 @@ class _PC101JosefinaScreenState extends State<PC101JosefinaScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    // Intentar reconectar si es necesario cuando los dependientes cambian
     Provider.of<PiscinasJosefinaProvider>(context, listen: false)
         .reconnectIfNeeded();
   }
@@ -54,13 +53,15 @@ class _PC101JosefinaScreenState extends State<PC101JosefinaScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.inactive) {
-      // La app está en segundo plano
-      PiscinasJosefinaProvider.channel!.sink.add('unsubscribeFJOSPC101');
+      if (PiscinasJosefinaProvider.channel != null) {
+        PiscinasJosefinaProvider.channel!.sink.add('unsubscribeFJOSPC101');
+        debugPrint('[PC101] Cancelando suscripción (app en segundo plano)');
+      }
     } else if (state == AppLifecycleState.resumed) {
-      // La app volvió al primer plano
       if (PiscinasJosefinaProvider.channel != null) {
         Provider.of<PiscinasJosefinaProvider>(context, listen: false)
             .subscribePC101();
+        debugPrint('[PC101] Resuscripción al volver a primer plano');
       }
     }
   }
@@ -69,7 +70,10 @@ class _PC101JosefinaScreenState extends State<PC101JosefinaScreen>
   void dispose() {
     firstLoad = true;
     WidgetsBinding.instance.removeObserver(this);
-    PiscinasJosefinaProvider.channel!.sink.add('unsubscribeFJOSPC101');
+    if (PiscinasJosefinaProvider.channel != null) {
+      PiscinasJosefinaProvider.channel!.sink.add('unsubscribeFJOSPC101');
+      debugPrint('[PC101] Cancelando suscripción (dispose)');
+    }
     PiscinasJosefinaProvider.subscriptionPC101?.cancel();
     PiscinasJosefinaProvider.subscriptionPC101 = null;
     super.dispose();
@@ -86,9 +90,6 @@ class _PC101JosefinaScreenState extends State<PC101JosefinaScreen>
             final provider =
                 Provider.of<PiscinasJosefinaProvider>(context, listen: false);
             provider.reconnectIfNeeded();
-            if (PiscinasJosefinaProvider.channel != null) {
-              // provider.subscribePiscinasInfoGeneralGraca();
-            }
             Navigator.canPop(context);
           });
         }
@@ -165,58 +166,91 @@ class _PC101JosefinaScreenState extends State<PC101JosefinaScreen>
             ],
           ),
         ),
-        body: Consumer<PiscinasJosefinaProvider>(
-            builder: (context, ebProvider, child) {
-          final apiDataList = ebProvider.apiDataListPC101;
+        body: Stack(
+          children: [
+            // PinkBox siempre visible
+            const Positioned(top: -110, left: 0, child: PinkBox()),
 
-          if (PiscinasJosefinaProvider.isLoading2 && firstLoad) {
-            // return const Center(
-            //   child: CircularProgressIndicator(
-            //     color: Color.fromARGB(255, 4, 63, 122),
-            //   ),
-            // );
-          } else if (ebProvider.hasError) {
-            return Center(child: Text('Error: ${ebProvider.errorMessage}'));
-          } else if (ebProvider.apiDataListPC101.isEmpty) {
-            // return const CircularProgressIndicator(
-            //   color: Color.fromARGB(255, 4, 63, 122),
-            // );
-          }
+            // Contenido que depende de los datos
+            SafeArea(
+              child: Consumer<PiscinasJosefinaProvider>(
+                builder: (context, ebProvider, child) {
+                  apiDataList = ebProvider.apiDataListPC101;
 
-          return Stack(
-            children: [
-              const Positioned(top: -100, left: -30, child: PinkBox()),
-              PiscinasJosefinaProvider.isLoading2
-                  ? const Center(
+                  // Verificar si el proveedor tiene error
+                  if (ebProvider.hasError) {
+                    return Center(
+                      child: ErrorScreen(
+                        message:
+                            'Error de conexión: ${ebProvider.errorMessage}',
+                        onRetry: () => ebProvider.subscribePC101(),
+                      ),
+                    );
+                  }
+
+                  // Verificar si está cargando
+                  if (PiscinasJosefinaProvider.isLoading2) {
+                    return const Center(
                       child: CircularProgressIndicator(
                         color: Color.fromARGB(255, 4, 63, 122),
                       ),
-                    )
-                  : SafeArea(
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            left: 2, right: 2, top: 0, bottom: 0),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'Tableros',
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Container(
-                                constraints: BoxConstraints(
+                    );
+                  }
+
+                  // Verificar que los datos estén completos
+                  bool datosCompletos = apiDataList.length >= 3 &&
+                      (apiDataList[0]?.isNotEmpty ?? false) &&
+                      (apiDataList[1]?.isNotEmpty ?? false) &&
+                      (apiDataList[2]?.isNotEmpty ?? false);
+
+                  if (!datosCompletos) {
+                    return Center(
+                      child: ErrorScreen(
+                        message: 'Datos incompletos o en sincronización',
+                        onRetry: () {
+                          debugPrint('[PC101] Reintentando suscripción...');
+                          ebProvider.subscribePC101();
+                        },
+                      ),
+                    );
+                  }
+
+                  // Si los datos están completos, mostramos todo el contenido
+                  return Column(
+                    children: [
+                      // Texto "Tableros" (solo visible cuando los datos están cargados)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 10),
+                        child: Text(
+                          'Tableros',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+
+                      // Contenido principal
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 2, right: 2, top: 0, bottom: 0),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  constraints: BoxConstraints(
                                     minWidth: 100,
                                     maxWidth:
                                         MediaQuery.of(context).size.width *
                                             0.99,
-                                    minHeight: 100),
-                                height: 274,
-                                child: SlideShow(
+                                    minHeight: 100,
+                                  ),
+                                  height: 274,
+                                  child: SlideShow(
                                     bulletPrimario: 10,
                                     bulletSecundario: 8,
                                     colorPrimario:
@@ -226,42 +260,44 @@ class _PC101JosefinaScreenState extends State<PC101JosefinaScreen>
                                         tablero: 'TA101-1',
                                         numCircuito: 2,
                                         sizeCirc: 22,
-                                        numAirOn: apiDataList.isNotEmpty &&
-                                                apiDataList[0].isNotEmpty
-                                            ? apiDataList[0][0]["Num_Air_On"]
-                                            : 0,
-                                        statComm: apiDataList.isNotEmpty &&
-                                                apiDataList[1].isNotEmpty
-                                            ? apiDataList[1][0]
-                                                ["TA_101_01.Stat_Comm"]
-                                            : false,
-                                        imputsLN: apiDataList.isNotEmpty &&
-                                                apiDataList[1].isNotEmpty
-                                            ? apiDataList[1][0]
-                                                ["TA_101_01.Inputs"]
-                                            : 0,
+                                        numAirOn:
+                                            DataAccessUtils.getNestedValue(
+                                                apiDataList,
+                                                [0, 0, "Num_Air_On"],
+                                                0),
+                                        statComm:
+                                            DataAccessUtils.getNestedValue(
+                                                apiDataList,
+                                                [1, 0, "TA_101_01.Stat_Comm"],
+                                                false),
+                                        imputsLN:
+                                            DataAccessUtils.getNestedValue(
+                                                apiDataList,
+                                                [1, 0, "TA_101_01.Inputs"],
+                                                0),
                                       ),
-                                    ]),
-                              ),
-                              const SizedBox(
-                                height: 15,
-                              ),
-                              const Text(
-                                'General Piscina',
-                                style: TextStyle(
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                                const Text(
+                                  'General Piscina',
+                                  style: TextStyle(
                                     fontSize: 15,
                                     color: Colors.black,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Container(
-                                constraints: BoxConstraints(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Container(
+                                  constraints: BoxConstraints(
                                     minWidth: 100,
                                     maxWidth:
                                         MediaQuery.of(context).size.width *
                                             0.98,
-                                    minHeight: 100),
-                                height: 240,
-                                child: SlideShow(
+                                    minHeight: 100,
+                                  ),
+                                  height: 240,
+                                  child: SlideShow(
                                     bulletPrimario: 10,
                                     bulletSecundario: 8,
                                     colorPrimario:
@@ -273,127 +309,178 @@ class _PC101JosefinaScreenState extends State<PC101JosefinaScreen>
                                       InfoGeneralPS(
                                         apiDataList: apiDataList,
                                       ),
-                                    ]),
-                              ),
-                              const Text(
-                                'Comunicaciones',
-                                style: TextStyle(
+                                    ],
+                                  ),
+                                ),
+                                const Text(
+                                  'Comunicaciones',
+                                  style: TextStyle(
                                     fontSize: 15,
                                     color: Colors.black,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Container(
-                                constraints: BoxConstraints(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Container(
+                                  constraints: BoxConstraints(
                                     minWidth: 100,
                                     maxWidth:
                                         MediaQuery.of(context).size.width * 0.9,
-                                    minHeight: 100),
-                                height: 100,
-                                decoration: BoxDecoration(
+                                    minHeight: 100,
+                                  ),
+                                  height: 100,
+                                  decoration: BoxDecoration(
                                     color: Colors.white.withOpacity(1),
                                     borderRadius: const BorderRadius.all(
-                                        Radius.circular(20)),
+                                      Radius.circular(20),
+                                    ),
                                     boxShadow: const [
                                       BoxShadow(
                                         color: Color.fromRGBO(9, 31, 72, 1),
                                         blurRadius: 3,
                                       )
-                                    ]),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    const Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Text(
-                                          'TA101-1',
-                                          style: TextStyle(
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      const Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Text(
+                                            'TA101-1',
+                                            style: TextStyle(
                                               color:
                                                   Color.fromRGBO(9, 31, 72, 1),
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        apiDataList.isNotEmpty &&
-                                                apiDataList[2].isNotEmpty
-                                            ? apiDataList[2][0]['Stat_TA101-1']
-                                                ? const Icon(Icons.check_circle,
-                                                    color: Colors.green)
-                                                : const Icon(
-                                                    Icons.close_rounded,
-                                                    color: Colors.red)
-                                            : const Text(''),
-                                      ],
-                                    ),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        apiDataList.isNotEmpty &&
-                                                apiDataList[2].isNotEmpty
-                                            ? apiDataList[2][0]
-                                                        ['Pot_TA101-1'] >=
-                                                    -67
-                                                ? const Icon(Icons.network_wifi,
-                                                    color: Colors.green)
-                                                : (apiDataList[2][0][
-                                                                'Pot_TA101-1'] <=
-                                                            -68 &&
-                                                        apiDataList[2][0][
-                                                                'Pot_TA101-1'] >=
-                                                            -79)
-                                                    ? const Icon(
-                                                        Icons.network_wifi,
-                                                        color:
-                                                            Colors.orangeAccent)
-                                                    : apiDataList[2][0][
-                                                                'Pot_TA101-1'] <=
-                                                            -80
-                                                        ? const Icon(
-                                                            Icons.network_wifi,
-                                                            color: Colors.red)
-                                                        : const Text('')
-                                            : const Text(''),
-                                      ],
-                                    ),
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        apiDataList.isNotEmpty &&
-                                                apiDataList[2].isNotEmpty
-                                            ? Text(apiDataList[2][0]
-                                                    ['Pot_TA101-1']
-                                                .toString())
-                                            : const Text(''),
-                                      ],
-                                    ),
-                                    Image.asset('assets/antenaIcono.png',
-                                        width: 70, height: 70)
-                                  ],
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          _buildStatusIcon(
+                                            DataAccessUtils.getNestedValue(
+                                                apiDataList,
+                                                [2, 0, 'Stat_TA101-1'],
+                                                false),
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          _buildSignalIcon(
+                                            DataAccessUtils.getNestedValue(
+                                                apiDataList,
+                                                [2, 0, 'Pot_TA101-1'],
+                                                -100),
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Text(
+                                            DataAccessUtils.getNestedValue(
+                                                    apiDataList,
+                                                    [2, 0, 'Pot_TA101-1'],
+                                                    0)
+                                                .toString(),
+                                          ),
+                                        ],
+                                      ),
+                                      Image.asset('assets/antenaIcono.png',
+                                          width: 70, height: 70),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(
-                                height: 15,
-                              ),
-                            ],
+                                const SizedBox(height: 15),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-            ],
-          );
-        }),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  // Método auxiliar para el icono de estado
+  Widget _buildStatusIcon(bool isActive) {
+    return isActive
+        ? const Icon(Icons.check_circle, color: Colors.green)
+        : const Icon(Icons.close_rounded, color: Colors.red);
+  }
+
+  // Método auxiliar para el icono de señal
+  Widget _buildSignalIcon(int potencia) {
+    if (potencia >= -67) {
+      return const Icon(Icons.network_wifi, color: Colors.green);
+    } else if (potencia <= -68 && potencia >= -79) {
+      return const Icon(Icons.network_wifi, color: Colors.orangeAccent);
+    } else if (potencia <= -80) {
+      return const Icon(Icons.network_wifi, color: Colors.red);
+    } else {
+      return const Text('');
+    }
+  }
+}
+
+// Clase ErrorScreen para mostrar mensajes de error
+class ErrorScreen extends StatelessWidget {
+  final String message;
+  final VoidCallback? onRetry;
+
+  const ErrorScreen({
+    Key? key,
+    this.message = 'Datos incompletos o en sincronización',
+    this.onRetry,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.warning_amber_rounded, size: 50, color: Colors.amber),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            message,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        if (onRetry != null) ...[
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: onRetry,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 4, 63, 122),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Reintentar'),
+          ),
+        ],
+      ],
     );
   }
 }

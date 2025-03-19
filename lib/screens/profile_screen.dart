@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:appnaturisa/helpers/theme.dart';
 import 'package:appnaturisa/providers/user_provider.dart';
 import 'package:appnaturisa/screens/cerrar_sesion_screen.dart';
 import 'package:appnaturisa/screens/josefina/edit_profile_screen.dart';
@@ -143,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 4, 63, 122),
+                        backgroundColor: AppTheme.primaryBlue,
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         textStyle: const TextStyle(fontSize: 18),
                         shape: RoundedRectangleBorder(
@@ -202,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _buildInfoTile(
                       title: 'Email',
                       value: StorageService.prefs.getString('email') ??
-                          'diiszamb@espol.edu.ec'),
+                          'No disponible'),
                   _buildInfoTile(
                       title: 'Teléfono',
                       value: StorageService.prefs.getString('celular') ??

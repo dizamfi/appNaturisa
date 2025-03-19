@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:appnaturisa/helpers/theme.dart';
 import 'package:appnaturisa/screens/josefina/aireacion_josefina_screen.dart';
+import 'package:appnaturisa/screens/josefina/bombeo/bombeo_josefina_screen.dart';
 import 'package:appnaturisa/screens/josefina/comunicaciones_josefina_screen.dart';
 import 'package:appnaturisa/services/storage_service.dart';
 import 'package:flutter/material.dart';
@@ -52,10 +54,11 @@ class MonitoreoScreen extends StatelessWidget {
             // color: Color.fromRGBO(1, 39, 8, 0.9),
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 4, 63, 122), // Azul oscuro
+                // Color.fromARGB(255, 4, 63, 122), // Azul oscuro
+                AppTheme.primaryBlue,
                 // Color(0xFF003366), // Azul oscuro
-
-                Color(0xFF0073CC), // Azul medio
+                AppTheme.primaryBlue,
+                // Color(0xFF0073CC), // Azul medio
                 // Color(0xFF00A3FF), // Azul claro
               ],
               begin: Alignment.centerLeft,
@@ -169,8 +172,10 @@ class MonitoreoScreen extends StatelessWidget {
                         onTap: () => _showAvatarDialog(context),
                         child: CircleAvatar(
                           radius: 30, // Imagen de ejemplo
-                          backgroundColor: const Color.fromRGBO(
-                              201, 202, 203, 0.9), // Tamaño del avatar
+                          backgroundColor:
+                              // const Color.fromRGBO(
+                              //     201, 202, 203, 0.9), // Tamaño del avatar
+                              Colors.white,
                           backgroundImage:
                               StorageService.prefs.getString('profileImage') !=
                                       null
@@ -195,22 +200,18 @@ class MonitoreoScreen extends StatelessWidget {
                       // ),
                       const Text(
                         'Monitoreo',
-                        style: TextStyle(color: Colors.white, fontSize: 17),
-                      ),
-                      const Row(
-                        children: [
-                          // Icon(
-                          //   Icons.notifications,
-                          //   color: Colors.white,
-                          //   size: 30,
-                          // ),
-                          Icon(
-                            Icons.menu,
+                        style: TextStyle(
                             color: Colors.white,
-                            size: 30,
-                          ),
-                        ],
-                      )
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
+                      ),
+
+                      const Text(
+                        'Monit',
+                        style:
+                            TextStyle(color: Colors.transparent, fontSize: 17),
+                      ),
+                      // Spacer()
                     ],
                   ),
                 ),
@@ -277,30 +278,43 @@ class MonitoreoScreen extends StatelessWidget {
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 30),
-                    itemCount: 2, // Número de tarjetas
+                    itemCount: 3, // Número de tarjetas
                     itemBuilder: (context, index) {
                       return Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: index == 0
-                            ? const _FitnessCard(
-                                icon: Icon(
-                                  Icons.air,
-                                  color: Colors.black,
-                                ),
-                                subTitulo:
-                                    'Monitorea las piscinas con todos sus tableros',
-                                titulo: 'Aireación',
-                                destination: AireacionJosefinaScreen(),
-                              )
-                            : const _FitnessCard(
-                                icon: Icon(FontAwesomeIcons.towerBroadcast,
-                                    color: Colors.black),
-                                subTitulo:
-                                    'Monitorea la comunicación de todas las antenas',
-                                titulo: 'Comunicaciones',
-                                destination: ComunicacionesJosefinaScreen(),
-                              ),
-                      );
+                          padding: const EdgeInsets.only(right: 10),
+                          child: index == 0
+                              ? const _FitnessCard(
+                                  icon: Icon(
+                                    Icons.air,
+                                    color: Colors.black,
+                                  ),
+                                  subTitulo:
+                                      'Monitorea las piscinas con todos sus tableros',
+                                  titulo: 'Aireación',
+                                  destination: AireacionJosefinaScreen(),
+                                )
+                              : index == 1
+                                  ? const _FitnessCard(
+                                      icon: Icon(
+                                        Icons.water_drop,
+                                        color: Colors.black,
+                                      ),
+                                      subTitulo:
+                                          'Monitorea el bombeo de agua en tiempo real',
+                                      titulo: 'Bombeo',
+                                      destination:
+                                          BombeoJosefinaScreen(), // Necesitarás crear esta pantalla
+                                    )
+                                  : const _FitnessCard(
+                                      icon: Icon(
+                                          FontAwesomeIcons.towerBroadcast,
+                                          color: Colors.black),
+                                      subTitulo:
+                                          'Monitorea la comunicación de todas las antenas',
+                                      titulo: 'Comunicaciones',
+                                      destination:
+                                          ComunicacionesJosefinaScreen(),
+                                    ));
                     },
                   ),
                 ),
@@ -392,9 +406,11 @@ class _FitnessCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         gradient: const LinearGradient(
                           colors: [
-                            Color.fromARGB(255, 12, 55, 100), // Azul oscuro
+                            // Color.fromARGB(255, 12, 55, 100), // Azul oscuro
+                            AppTheme.primaryBlue,
                             // Color(0xFF003366), // Azul oscuro
-                            Color.fromARGB(255, 4, 63, 122), // Azul oscuro
+                            AppTheme.primaryBlue,
+                            // Color.fromARGB(255, 4, 63, 122), // Azul oscuro
 
                             // Color(0xFF0073CC), // A
                             //zul medio
@@ -497,8 +513,10 @@ void _showAvatarDialog(BuildContext context) {
           child: Center(
             child: CircleAvatar(
               radius: 100,
-              backgroundColor: const Color.fromRGBO(
-                  201, 202, 203, 0.9), // Tamaño ampliado del avatar
+              backgroundColor:
+                  // const Color.fromRGBO(
+                  //     201, 202, 203, 0.9), // Tamaño ampliado del avatar
+                  Colors.white,
               backgroundImage:
                   StorageService.prefs.getString('profileImage') != null
                       ? FileImage(

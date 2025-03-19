@@ -13,11 +13,13 @@ class StorageService {
   }
 
   Future<void> saveUser(String name, String lastName, String phone,
-      String cargo, String conexion) async {
+      String cargo, String conexion, String email) async {
     await prefs.setString('nombre', name);
     await prefs.setString('apellido', lastName);
     await prefs.setString('celular', phone);
     await prefs.setString('cargo', cargo);
+    await prefs.setString('email', email);
+
     // await prefs.setString('profileImage', photo);
     await prefs.setString('ultconexion', conexion);
   }

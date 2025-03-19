@@ -92,6 +92,7 @@ class PiscinasJosefinaProvider extends ChangeNotifier {
 
   final List<dynamic> _apiDataListInfoGeneralPis = [];
   final List<dynamic> _apiDataListAntenas = [];
+  final List<dynamic> _apiDataListEBFJOS = [];
 
   static StreamSubscription? subscriptionPC20;
   static StreamSubscription? subscriptionPC101;
@@ -168,6 +169,7 @@ class PiscinasJosefinaProvider extends ChangeNotifier {
 
   static StreamSubscription? subscriptionInfoGeneralPis;
   static StreamSubscription? subscriptionAntenas;
+  static StreamSubscription? subscriptionEBFJOS;
 
   List<dynamic> get apiDataListPC20 => _apiDataListPC20;
   List<dynamic> get apiDataListPC101 => _apiDataListPC101;
@@ -243,6 +245,7 @@ class PiscinasJosefinaProvider extends ChangeNotifier {
 
   List<dynamic> get apiDataListInfoGeneralPis => _apiDataListInfoGeneralPis;
   List<dynamic> get apiDataListAntenas => _apiDataListAntenas;
+  List<dynamic> get apiDataListEBFJOS => _apiDataListEBFJOS;
 
   bool get isLoading => isLoading2;
   bool get hasError => _hasError;
@@ -327,6 +330,294 @@ class PiscinasJosefinaProvider extends ChangeNotifier {
       });
     } else {
       // print('WebSocket ya está conectado.');
+    }
+  }
+
+  void subscribeEBFJOS() {
+    isLoading2 = true; // Comenzar el estado de cargando
+    _hasError = false; // Reiniciar el estado de error
+
+    _subscribeTo('EB');
+    notifyListeners();
+
+    if (subscriptionEBFJOS == null) {
+      _apiDataListEBFJOS.clear();
+      List<Map<dynamic, dynamic>> apiDataList = [];
+      List<Map<dynamic, dynamic>> apiDataListGral = [];
+      List<Map<dynamic, dynamic>> apiDataListTCP = [];
+      List<Map<dynamic, dynamic>> apiDataListAntenas = [];
+      if (_broadcastStream != null) {
+        subscriptionEBFJOS = _broadcastStream!.listen((event) {
+          apiDataList.clear();
+          apiDataListGral.clear();
+          apiDataListTCP.clear();
+          apiDataListAntenas.clear();
+          final decodedEvent = json.decode(event);
+          if (decodedEvent.containsKey('EBJosefina')) {
+            dynamic firstItem = decodedEvent['EBJosefina'][0];
+            dynamic itemGral = decodedEvent['EBJosefinaGral'][0];
+            dynamic itemTCP = decodedEvent['EBJosefinaTCP'][0];
+            dynamic itemAntenas = decodedEvent['EBJosefinaAntenas'][0];
+
+            apiDataList.add({
+              'I L1': '${firstItem['ST1_Corrien_L1']} A',
+              'Volt L1-L2': '${firstItem['ST1_Tens_red_L1-L2']} V',
+              'I L2': '${firstItem['ST1_Corrien_L2']} A',
+              'Volt L2-L3': '${firstItem['ST1_Tens_red_L2-L3']} V',
+              'I L3': '${firstItem['ST1_Corrien_L3']} A',
+              'Volt L3-L1': '${firstItem['ST1_Tens_red_L3-L1']} V',
+              'Pot Inst': '${firstItem['ST1_Potencia_Activa']} Kw',
+              'FP': double.parse(firstItem['ST1_Factor_Potencia'])
+                  .toStringAsFixed(2),
+              'Energ_Act':
+                  '${double.parse(firstItem['ST1_Energ_Activa']).toStringAsFixed(2)} MWh',
+              'Horómetro': '${firstItem['ST1_Horometro']} H',
+              'Hrs_Dia':
+                  '${double.parse(firstItem['ST1_Hrs_Dia']).toStringAsFixed(2)} H/D',
+              'Hrs_Dia_Ant':
+                  '${double.parse(firstItem['ST1_Hrs_Dia_Ant']).toStringAsFixed(2)} H/D',
+            });
+
+            apiDataList.add({
+              'I L1': '${firstItem['ST2_Corrien_L1']} A',
+              'Volt L1-L2': '${firstItem['ST2_Tens_red_L1-L2']} V',
+              'I L2': '${firstItem['ST2_Corrien_L2']} A',
+              'Volt L2-L3': '${firstItem['ST2_Tens_red_L2-L3']} V',
+              'I L3': '${firstItem['ST2_Corrien_L3']} A',
+              'Volt L3-L1': '${firstItem['ST2_Tens_red_L3-L1']} V',
+              'Pot Inst': '${firstItem['ST2_Potencia_Activa']} Kw',
+              'FP': double.parse(firstItem['ST2_Factor_Potencia'])
+                  .toStringAsFixed(2),
+              'Energ_Act':
+                  '${double.parse(firstItem['ST2_Energ_Activa']).toStringAsFixed(2)} MWh',
+              'Horómetro': '${firstItem['ST2_Horometro']} H',
+              'Hrs_Dia':
+                  '${double.parse(firstItem['ST2_Hrs_Dia']).toStringAsFixed(2)} H/D',
+              'Hrs_Dia_Ant':
+                  '${double.parse(firstItem['ST2_Hrs_Dia_Ant']).toStringAsFixed(2)} H/D',
+            });
+
+            apiDataList.add({
+              'I L1': '${firstItem['ST3_Corrien_L1']} A',
+              'Volt L1-L2': '${firstItem['ST3_Tens_red_L1-L2']} V',
+              'I L2': '${firstItem['ST3_Corrien_L2']} A',
+              'Volt L2-L3': '${firstItem['ST3_Tens_red_L2-L3']} V',
+              'I L3': '${firstItem['ST3_Corrien_L3']} A',
+              'Volt L3-L1': '${firstItem['ST3_Tens_red_L3-L1']} V',
+              'Pot Inst': '${firstItem['ST3_Potencia_Activa']} Kw',
+              'FP': double.parse(firstItem['ST3_Factor_Potencia'])
+                  .toStringAsFixed(2),
+              'Energ_Act':
+                  '${double.parse(firstItem['ST3_Energ_Activa']).toStringAsFixed(2)} MWh',
+              'Horómetro': '${firstItem['ST3_Horometro']} H',
+              'Hrs_Dia':
+                  '${double.parse(firstItem['ST3_Hrs_Dia']).toStringAsFixed(2)} H/D',
+              'Hrs_Dia_Ant':
+                  '${double.parse(firstItem['ST3_Hrs_Dia_Ant']).toStringAsFixed(2)} H/D',
+            });
+
+            apiDataList.add({
+              'I L1': '${firstItem['ST4_Corrien_L1']} A',
+              'Volt L1-L2': '${firstItem['ST4_Tens_red_L1-L2']} V',
+              'I L2': '${firstItem['ST4_Corrien_L2']} A',
+              'Volt L2-L3': '${firstItem['ST4_Tens_red_L2-L3']} V',
+              'I L3': '${firstItem['ST4_Corrien_L3']} A',
+              'Volt L3-L1': '${firstItem['ST4_Tens_red_L3-L1']} V',
+              'Pot Inst': '${firstItem['ST4_Potencia_Activa']} Kw',
+              'FP': double.parse(firstItem['ST4_Factor_Potencia'])
+                  .toStringAsFixed(2),
+              'Energ_Act':
+                  '${double.parse(firstItem['ST4_Energ_Activa']).toStringAsFixed(2)} MWh',
+              'Horómetro': '${firstItem['ST4_Horometro']} H',
+              'Hrs_Dia':
+                  '${double.parse(firstItem['ST4_Hrs_Dia']).toStringAsFixed(2)} H/D',
+              'Hrs_Dia_Ant':
+                  '${double.parse(firstItem['ST4_Hrs_Dia_Ant']).toStringAsFixed(2)} H/D',
+            });
+
+            apiDataList.add({
+              'I L1': '${firstItem['ST5_Corrien_L1']} A',
+              'Volt L1-L2': '${firstItem['ST5_Tens_red_L1-L2']} V',
+              'I L2': '${firstItem['ST5_Corrien_L2']} A',
+              'Volt L2-L3': '${firstItem['ST5_Tens_red_L2-L3']} V',
+              'I L3': '${firstItem['ST5_Corrien_L3']} A',
+              'Volt L3-L1': '${firstItem['ST5_Tens_red_L3-L1']} V',
+              'Pot Inst': '${firstItem['ST5_Potencia_Activa']} Kw',
+              'FP': double.parse(firstItem['ST5_Factor_Potencia'])
+                  .toStringAsFixed(2),
+              'Energ_Act':
+                  '${double.parse(firstItem['ST5_Energ_Activa']).toStringAsFixed(2)} MWh',
+              'Horómetro': '${firstItem['ST5_Horometro']} H',
+              'Hrs_Dia':
+                  '${double.parse(firstItem['ST5_Hrs_Dia']).toStringAsFixed(2)} H/D',
+              'Hrs_Dia_Ant':
+                  '${double.parse(firstItem['ST5_Hrs_Dia_Ant']).toStringAsFixed(2)} H/D',
+            });
+
+            Map<String, bool> stationStatus = {
+              'st1': firstItem['ST1_Status'].toLowerCase() == 'true',
+              'st2': firstItem['ST2_Status'].toLowerCase() == 'true',
+              'st3': firstItem['ST3_Status'].toLowerCase() == 'true',
+              'st4': firstItem['ST4_Status'].toLowerCase() == 'true',
+              'st5': firstItem['ST5_Status'].toLowerCase() == 'true',
+            };
+
+            ;
+
+// Contar estaciones activas por grupo
+            int activeStationsGrupo1 = 0;
+            int activeStationsGrupo2 = 0;
+
+// Contar grupo 1 (estaciones 1 y 2)
+            if (stationStatus['st1'] == true) activeStationsGrupo1++;
+            if (stationStatus['st2'] == true) activeStationsGrupo1++;
+
+// Contar grupo 2 (estaciones 3, 4 y 5)
+            if (stationStatus['st3'] == true) activeStationsGrupo2++;
+            if (stationStatus['st4'] == true) activeStationsGrupo2++;
+            if (stationStatus['st5'] == true) activeStationsGrupo2++;
+
+// Total de estaciones activas (mantenemos esto por compatibilidad)
+            int activeStations =
+                stationStatus.values.where((value) => value == true).length;
+
+// Agregar todos los datos a apiDataList
+            apiDataList.add(stationStatus);
+            apiDataList.add({'on': activeStations});
+            apiDataList.add({'estado': activeStations > 0});
+            apiDataList.add({'grupo1_activas': activeStationsGrupo1});
+            apiDataList.add({'grupo2_activas': activeStationsGrupo2});
+            apiDataList.add({'grupo1_estado': activeStationsGrupo1 > 0});
+            apiDataList.add({'grupo2_estado': activeStationsGrupo2 > 0});
+
+            apiDataListGral.add({
+              'succion':
+                  '${double.parse(itemGral['EBG1_Gral_Niv_Succ']).toStringAsFixed(2)} m',
+              'descarga':
+                  '${double.parse(itemGral['EBG1_Gral_Niv_Desc']).toStringAsFixed(2)} m',
+              'inputsPlc': int.parse(itemGral['EBG1_Gral_Inputs_PLC']),
+              'set_descarga':
+                  '${double.parse(itemGral['EBG1_Gral_Stp_Niv_Desc']).toStringAsFixed(2)} m',
+              // 'niv_succ_1':
+              //     '${double.parse(firstItem['G1_Stp_Niv_Succ_1']).toStringAsFixed(2)} m',
+              // 'niv_succ_2':
+              //     '${double.parse(firstItem['G1_Stp_Niv_Succ_2']).toStringAsFixed(2)} m',
+            });
+
+            apiDataListGral.add({
+              'succion':
+                  '${double.parse(itemGral['EBG2_Gral_Niv_Succ']).toStringAsFixed(2)} m',
+              'descarga':
+                  '${double.parse(itemGral['EBG2_Gral_Niv_Desc']).toStringAsFixed(2)} m',
+              'inputsPlc': int.parse(itemGral['EBG2_Gral_Inputs_PLC']),
+              // 'niv_succ_1':
+              //     '${double.parse(firstItem['G1_Stp_Niv_Succ_1']).toStringAsFixed(2)} m',
+              // 'niv_succ_2':
+              //     '${double.parse(firstItem['G1_Stp_Niv_Succ_2']).toStringAsFixed(2)} m',
+            });
+
+            apiDataListTCP.add({
+              'FP': double.parse(itemTCP['EBG1_RelayVar_PF_Avg'])
+                  .toStringAsFixed(2),
+              // 'Temp': '${double.parse(firstItem['G1_Temp_Rap']).round()} °C',
+              'THDI':
+                  '${double.parse(itemTCP['EBG1_RelayVar_THDI_tot']).round()} %',
+              'THDV':
+                  '${double.parse(itemTCP['EBG1_RelayVar_THDV_tot']).round()} %',
+              'I1': '${double.parse(itemTCP['EBG1_RelayVar_I_1']).round()} A',
+              'I2': '${double.parse(itemTCP['EBG1_RelayVar_I_2']).round()} A',
+              'I3': '${double.parse(itemTCP['EBG1_RelayVar_I_3']).round()} A',
+              'V1': '${double.parse(itemTCP['EBG1_RelayVar_V_12']).round()} V',
+              'V2': '${double.parse(itemTCP['EBG1_RelayVar_V_23']).round()} V',
+              'V3': '${double.parse(itemTCP['EBG1_RelayVar_V_31']).round()} V',
+              'Pot Inst':
+                  '${double.parse(itemTCP['EBG1_RelayVar_P_Total']).round()} Kw',
+              'Energ_Act':
+                  '${double.parse(itemTCP['EBG1_RelayVar_T1_Imp_Act_Index']).round()} MWh',
+              // 'Alarm2': itemTCP['G1_Alarm2'],
+            });
+
+            apiDataListTCP.add({
+              'FP': double.parse(itemTCP['EBG2_RelayVar_PF_Avg'])
+                  .toStringAsFixed(2),
+              // 'Temp': '${double.parse(firstItem['G1_Temp_Rap']).round()} °C',
+              'THDI':
+                  '${double.parse(itemTCP['EBG2_RelayVar_THDI_tot']).round()} %',
+              'THDV':
+                  '${double.parse(itemTCP['EBG2_RelayVar_THDV_tot']).round()} %',
+              'I1': '${double.parse(itemTCP['EBG2_RelayVar_I_1']).round()} A',
+              'I2': '${double.parse(itemTCP['EBG2_RelayVar_I_2']).round()} A',
+              'I3': '${double.parse(itemTCP['EBG2_RelayVar_I_3']).round()} A',
+              'V1': '${double.parse(itemTCP['EBG2_RelayVar_V_12']).round()} V',
+              'V2': '${double.parse(itemTCP['EBG2_RelayVar_V_23']).round()} V',
+              'V3': '${double.parse(itemTCP['EBG2_RelayVar_V_31']).round()} V',
+              // 'Pot Inst': '${itemTCP['EBG2_RelayVar_P_Total']} Kw',
+              'Pot_Inst':
+                  '${double.parse(itemTCP['EBG2_RelayVar_P_Total']).round()} KW',
+
+              'Energ_Act':
+                  '${double.parse(itemTCP['EBG2_RelayVar_T1_Imp_Act_Index']).round()} MWh',
+              // 'Alarm2': itemTCP['G1_Alarm2'],
+            });
+
+            apiDataListAntenas.add({
+              'Pot_PTP-T1': int.parse(itemAntenas['Pot_PTP-T1']),
+              // 'Pot_AP1-B': int.parse(itemAntenas['Pot_AP1-B']),
+              // 'Pot_Camp-PTP-Mari': int.parse(itemAntenas['Pot_Camp-PTP-Mari']),
+              'Pot_EB_G1': int.parse(itemAntenas['Pot_EB_G1']),
+              'Pot_PTP-Camp-T1': int.parse(itemAntenas['Pot_PTP-Camp-T1']),
+              // 'Pot_PTP-Camp-T2': int.parse(itemAntenas['Pot_PTP-Camp-T2']),
+              'Pot_PTP-Camp-T3': int.parse(itemAntenas['Pot_PTP-Camp-T3']),
+              // 'Pot_PTP-Mari': int.parse(itemAntenas['Pot_PTP-Mari']),
+              // 'Pot_PTP-T2': int.parse(itemAntenas['Pot_PTP-T2']),
+              'Pot_PTP-T3': int.parse(itemAntenas['Pot_PTP-T3']),
+              'Pot-AP1': int.parse(itemAntenas['Pot-AP1']),
+              // 'Pot-AP2': int.parse(itemAntenas['Pot-AP2']),
+              'Pot-AP3': int.parse(itemAntenas['Pot-AP3']),
+              'Stat_PTP-Camp-T3':
+                  itemAntenas['Stat_PTP-Camp-T3'].toLowerCase() == 'true',
+              // 'Stat_PTP-Mari':
+              // itemAntenas['Stat_PTP-Mari'].toLowerCase() == 'true',
+              'Stat_AP1': itemAntenas['Stat_AP1'].toLowerCase() == 'true',
+              // 'Stat_AP1-B': itemAntenas['Stat_AP1-B'].toLowerCase() == 'true',
+              // 'Stat_AP2': itemAntenas['Stat_AP2'].toLowerCase() == 'true',
+              'Stat_AP3': itemAntenas['Stat_AP3'].toLowerCase() == 'true',
+              'Stat_Camp-PTP-Mari':
+                  itemAntenas['Stat_Camp-PTP-Mari'].toLowerCase() == 'true',
+              'Stat_PTP-T1': itemAntenas['Stat_PTP-T1'].toLowerCase() == 'true',
+              // 'Stat_PTP-T2': itemAntenas['Stat_PTP-T2'].toLowerCase() == 'true',
+              'Stat_PTP-T3': itemAntenas['Stat_PTP-T3'].toLowerCase() == 'true',
+              'Stat_EB_G1': itemAntenas['Stat_EB_G1'].toLowerCase() == 'true',
+              'Stat_PTP-Camp-T1':
+                  itemAntenas['Stat_PTP-Camp-T1'].toLowerCase() == 'true',
+              // 'Stat_PTP-Camp-T2':
+              //     itemAntenas['Stat_PTP-Camp-T2'].toLowerCase() == 'true',
+            });
+            if (apiDataList.isNotEmpty &&
+                apiDataListTCP.isNotEmpty &&
+                apiDataListAntenas.isNotEmpty) {
+              _apiDataListEBFJOS.addAll([
+                apiDataList,
+                apiDataListGral,
+                apiDataListTCP,
+                apiDataListAntenas
+              ]);
+            }
+
+            print(_apiDataListEBFJOS[1][1]);
+
+            isLoading2 = false; // Finalizar el estado de cargando
+            if (!Piscina.contieneSoloArreglosVacios(_apiDataListEBFJOS)) {
+              notifyListeners();
+            }
+          }
+        }, onError: (error) {
+          isLoading2 = false; // Finalizar el estado de cargando
+          _hasError = true; // Activar el estado de error
+          _errorMessage = error.toString(); // Almacenar mensaje de error
+          notifyListeners();
+        });
+      } else {}
     }
   }
 
@@ -9483,7 +9774,7 @@ class PiscinasJosefinaProvider extends ChangeNotifier {
     isLoading2 = true; // Comenzar el estado de cargando
     _hasError = false; // Reiniciar el estado de error
 
-    _subscribeTo(piscina);
+    _subscribeTo("$piscina-2");
     notifyListeners();
 
     if (subscriptionPS47B == null) {
@@ -11778,19 +12069,608 @@ class PiscinasJosefinaProvider extends ChangeNotifier {
 
 // Cambiar a los tags de josefina
 
+  // void subscribePiscinasAntenasAndInfoGeneral() {
+  //   isLoading2 = true; // Comenzar el estado de cargando
+  //   _hasError = false; // Reiniciar el estado de error
+
+  //   _subscribeTo('InfoGeneralPS');
+  //   notifyListeners();
+
+  //   // print('qqqqq');
+
+  //   if (subscriptionInfoGeneralPis == null) {
+  //     // _apiDataListInfoGeneralPisSaved.add(_apiDataListInfoGeneralPis);
+  //     notifyListeners();
+  //     // print('Eliminandoooo');
+  //     _apiDataListInfoGeneralPis.clear();
+  //     List<Map<dynamic, dynamic>> apiDataList = [];
+  //     List<Map<dynamic, dynamic>> apiDataListOnPs = [];
+  //     List<Map<dynamic, dynamic>> apiDataListAntenas = [];
+  //     List<Map<dynamic, dynamic>> apiDataListOffAntenas = [];
+
+  //     try {
+  //       if (_broadcastStream != null) {
+  //         subscriptionInfoGeneralPis = _broadcastStream!.listen((event) {
+  //           // print('Aquiii');
+  //           apiDataList.clear();
+  //           apiDataListOnPs.clear();
+  //           apiDataListAntenas.clear();
+  //           apiDataListOffAntenas.clear();
+
+  //           final decodedEvent = json.decode(event);
+  //           if (decodedEvent.containsKey('InfoGeneralPS')) {
+  //             dynamic firstItem = decodedEvent['InfoGeneralPS'][0];
+  //             dynamic itemAntenas = decodedEvent['Antenas'][0];
+
+  //             apiDataList.add({
+  //               'PS06.Algun_Air_On':
+  //                   firstItem['PS06.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS06.Num_Air_On': int.parse(firstItem['PS06.Num_Air_On']),
+  //               'PS06.Alarm_Adver': int.parse(firstItem['PS06.Alarm_Adver']),
+  //               'PC103.Algun_Air_On':
+  //                   firstItem['PC103.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PC103.Num_Air_On': int.parse(firstItem['PC103.Num_Air_On']),
+  //               'PC103.Alarm_Adver': int.parse(firstItem['PC103.Alarm_Adver']),
+
+  //               'PC104.Algun_Air_On':
+  //                   firstItem['PC104.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PC104.Num_Air_On': int.parse(firstItem['PC104.Num_Air_On']),
+  //               'PC104.Alarm_Adver': int.parse(firstItem['PC104.Alarm_Adver']),
+
+  //               'PC107.Algun_Air_On':
+  //                   firstItem['PC107.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PC107.Num_Air_On': int.parse(firstItem['PC107.Num_Air_On']),
+  //               'PC107.Alarm_Adver': int.parse(firstItem['PC107.Alarm_Adver']),
+
+  //               'PS30.Algun_Air_On':
+  //                   firstItem['PS30.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS30.Num_Air_On': int.parse(firstItem['PS30.Num_Air_On']),
+  //               'PS30.Alarm_Adver': int.parse(firstItem['PS30.Alarm_Adver']),
+  //               'PS04.Algun_Air_On':
+  //                   firstItem['PS04.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS04.Num_Air_On': int.parse(firstItem['PS04.Num_Air_On']),
+  //               'PS04.Alarm_Adver': int.parse(firstItem['PS04.Alarm_Adver']),
+  //               'PC101.Algun_Air_On':
+  //                   firstItem['PC101.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PC101.Num_Air_On': int.parse(firstItem['PC101.Num_Air_On']),
+  //               'PC101.Alarm_Adver': int.parse(firstItem['PC101.Alarm_Adver']),
+  //               'PS27.Algun_Air_On':
+  //                   firstItem['PS27.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS27.Num_Air_On': int.parse(firstItem['PS27.Num_Air_On']),
+  //               'PS27.Alarm_Adver': int.parse(firstItem['PS27.Alarm_Adver']),
+  //               'PS40.Algun_Air_On':
+  //                   firstItem['PS40.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS40.Num_Air_On': int.parse(firstItem['PS40.Num_Air_On']),
+  //               'PS40.Alarm_Adver': int.parse(firstItem['PS40.Alarm_Adver']),
+  //               'PS41.Algun_Air_On':
+  //                   firstItem['PS41.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS41.Num_Air_On': int.parse(firstItem['PS41.Num_Air_On']),
+  //               'PS41.Alarm_Adver': int.parse(firstItem['PS41.Alarm_Adver']),
+  //               'PS42.Algun_Air_On':
+  //                   firstItem['PS42.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS42.Num_Air_On': int.parse(firstItem['PS42.Num_Air_On']),
+  //               'PS42.Alarm_Adver': int.parse(firstItem['PS42.Alarm_Adver']),
+  //               'PS43.Algun_Air_On':
+  //                   firstItem['PS43.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS43.Num_Air_On': int.parse(firstItem['PS43.Num_Air_On']),
+  //               'PS43.Alarm_Adver': int.parse(firstItem['PS43.Alarm_Adver']),
+  //               'PS44.Algun_Air_On':
+  //                   firstItem['PS44.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS44.Num_Air_On': int.parse(firstItem['PS44.Num_Air_On']),
+  //               'PS44.Alarm_Adver': int.parse(firstItem['PS44.Alarm_Adver']),
+  //               'PS45.Algun_Air_On':
+  //                   firstItem['PS45.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS45.Num_Air_On': int.parse(firstItem['PS45.Num_Air_On']),
+  //               'PS45.Alarm_Adver': int.parse(firstItem['PS45.Alarm_Adver']),
+  //               'PS46.Algun_Air_On':
+  //                   firstItem['PS46.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS46.Num_Air_On': int.parse(firstItem['PS46.Num_Air_On']),
+  //               'PS46.Alarm_Adver': int.parse(firstItem['PS46.Alarm_Adver']),
+  //               'PS47.Algun_Air_On':
+  //                   firstItem['PS47.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS47.Num_Air_On': int.parse(firstItem['PS47.Num_Air_On']),
+  //               'PS47.Alarm_Adver': int.parse(firstItem['PS47.Alarm_Adver']),
+  //               'PS47B.Algun_Air_On':
+  //                   firstItem['PS47B.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS47B.Num_Air_On': int.parse(firstItem['PS47B.Num_Air_On']),
+  //               'PS47B.Alarm_Adver': int.parse(firstItem['PS47B.Alarm_Adver']),
+  //               'PS48.Algun_Air_On':
+  //                   firstItem['PS48.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS48.Num_Air_On': int.parse(firstItem['PS48.Num_Air_On']),
+  //               'PS48.Alarm_Adver': int.parse(firstItem['PS48.Alarm_Adver']),
+  //               'PS49.Algun_Air_On':
+  //                   firstItem['PS49.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS49.Num_Air_On': int.parse(firstItem['PS49.Num_Air_On']),
+  //               'PS49.Alarm_Adver': int.parse(firstItem['PS49.Alarm_Adver']),
+  //               'PS50.Algun_Air_On':
+  //                   firstItem['PS50.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS50.Num_Air_On': int.parse(firstItem['PS50.Num_Air_On']),
+  //               'PS50.Alarm_Adver': int.parse(firstItem['PS50.Alarm_Adver']),
+  //               'PS51.Algun_Air_On':
+  //                   firstItem['PS51.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS51.Num_Air_On': int.parse(firstItem['PS51.Num_Air_On']),
+  //               'PS51.Alarm_Adver': int.parse(firstItem['PS51.Alarm_Adver']),
+  //               'PS52.Algun_Air_On':
+  //                   firstItem['PS52.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS52.Num_Air_On': int.parse(firstItem['PS52.Num_Air_On']),
+  //               'PS52.Alarm_Adver': int.parse(firstItem['PS52.Alarm_Adver']),
+  //               'PS53.Algun_Air_On':
+  //                   firstItem['PS53.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS53.Num_Air_On': int.parse(firstItem['PS53.Num_Air_On']),
+  //               'PS53.Alarm_Adver': int.parse(firstItem['PS53.Alarm_Adver']),
+  //               'PS54.Algun_Air_On':
+  //                   firstItem['PS54.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS54.Num_Air_On': int.parse(firstItem['PS54.Num_Air_On']),
+  //               'PS54.Alarm_Adver': int.parse(firstItem['PS54.Alarm_Adver']),
+  //               'PS55.Algun_Air_On':
+  //                   firstItem['PS55.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS55.Num_Air_On': int.parse(firstItem['PS55.Num_Air_On']),
+  //               'PS55.Alarm_Adver': int.parse(firstItem['PS55.Alarm_Adver']),
+  //               'PS56.Algun_Air_On':
+  //                   firstItem['PS56.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS56.Num_Air_On': int.parse(firstItem['PS56.Num_Air_On']),
+  //               'PS56.Alarm_Adver': int.parse(firstItem['PS56.Alarm_Adver']),
+  //               'PS57.Algun_Air_On':
+  //                   firstItem['PS57.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS57.Num_Air_On': int.parse(firstItem['PS57.Num_Air_On']),
+  //               'PS57.Alarm_Adver': int.parse(firstItem['PS57.Alarm_Adver']),
+  //               'PS58.Algun_Air_On':
+  //                   firstItem['PS58.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS58.Num_Air_On': int.parse(firstItem['PS58.Num_Air_On']),
+  //               'PS58.Alarm_Adver': int.parse(firstItem['PS58.Alarm_Adver']),
+  //               'PS05.Algun_Air_On':
+  //                   firstItem['PS05.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS05.Num_Air_On': int.parse(firstItem['PS05.Num_Air_On']),
+  //               'PS05.Alarm_Adver': int.parse(firstItem['PS05.Alarm_Adver']),
+  //               'PC102.Algun_Air_On':
+  //                   firstItem['PC102.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PC102.Num_Air_On': int.parse(firstItem['PC102.Num_Air_On']),
+  //               'PC102.Alarm_Adver': int.parse(firstItem['PC102.Alarm_Adver']),
+  //               'PC20.Algun_Air_On':
+  //                   firstItem['PC20.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PC20.Num_Air_On': int.parse(firstItem['PC20.Num_Air_On']),
+  //               'PC20.Alarm_Adver': int.parse(firstItem['PC20.Alarm_Adver']),
+  //               'PC106.Algun_Air_On':
+  //                   firstItem['PC106.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PC106.Num_Air_On': int.parse(firstItem['PC106.Num_Air_On']),
+  //               'PC106.Alarm_Adver': int.parse(firstItem['PC106.Alarm_Adver']),
+  //               'PC108.Algun_Air_On':
+  //                   firstItem['PC108.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PC108.Num_Air_On': int.parse(firstItem['PC108.Num_Air_On']),
+  //               'PC108.Alarm_Adver': int.parse(firstItem['PC108.Alarm_Adver']),
+  //               'PC111.Algun_Air_On':
+  //                   firstItem['PC111.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PC111.Num_Air_On': int.parse(firstItem['PC111.Num_Air_On']),
+  //               'PC111.Alarm_Adver': int.parse(firstItem['PC111.Alarm_Adver']),
+  //               'PC113.Algun_Air_On':
+  //                   firstItem['PC113.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PC113.Num_Air_On': int.parse(firstItem['PC113.Num_Air_On']),
+  //               'PC113.Alarm_Adver': int.parse(firstItem['PC113.Alarm_Adver']),
+  //               'PC114.Algun_Air_On':
+  //                   firstItem['PC114.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PC114.Num_Air_On': int.parse(firstItem['PC114.Num_Air_On']),
+  //               'PC114.Alarm_Adver': int.parse(firstItem['PC114.Alarm_Adver']),
+  //               'PC115.Algun_Air_On':
+  //                   firstItem['PC115.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PC115.Num_Air_On': int.parse(firstItem['PC115.Num_Air_On']),
+  //               'PC115.Alarm_Adver': int.parse(firstItem['PC115.Alarm_Adver']),
+  //               'PS08.Algun_Air_On':
+  //                   firstItem['PS08.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS08.Num_Air_On': int.parse(firstItem['PS08.Num_Air_On']),
+  //               'PS08.Alarm_Adver': int.parse(firstItem['PS08.Alarm_Adver']),
+  //               'PC116.Algun_Air_On':
+  //                   firstItem['PC116.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PC116.Num_Air_On': int.parse(firstItem['PC116.Num_Air_On']),
+  //               'PC116.Alarm_Adver': int.parse(firstItem['PC116.Alarm_Adver']),
+
+  //               'PS34.Algun_Air_On':
+  //                   firstItem['PS34.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS34.Num_Air_On': int.parse(firstItem['PS34.Num_Air_On']),
+  //               'PS34.Alarm_Adver': int.parse(firstItem['PS34.Alarm_Adver']),
+  //               'PC117.Algun_Air_On':
+  //                   firstItem['PC117.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PC117.Num_Air_On': int.parse(firstItem['PC117.Num_Air_On']),
+  //               'PC117.Alarm_Adver': int.parse(firstItem['PC117.Alarm_Adver']),
+  //               'PS24.Algun_Air_On':
+  //                   firstItem['PS24.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS24.Num_Air_On': int.parse(firstItem['PS24.Num_Air_On']),
+  //               'PS24.Alarm_Adver': int.parse(firstItem['PS24.Alarm_Adver']),
+  //               //   'PC117.Algun_Air_On':
+  //               //       firstItem['PC117.Algun_Air_On'].toLowerCase() == 'true',
+  //               //   'PC117.Num_Air_On': int.parse(firstItem['PC117.Num_Air_On']),
+  //               //   'PC117.Alarm_Adver': int.parse(firstItem['PC117.Alarm_Adver']),
+
+  //               'PS10.Algun_Air_On':
+  //                   firstItem['PS10.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS10.Num_Air_On': int.parse(firstItem['PS10.Num_Air_On']),
+  //               'PS10.Alarm_Adver': int.parse(firstItem['PS10.Alarm_Adver']),
+  //               'PS33.Algun_Air_On':
+  //                   firstItem['PS33.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS33.Num_Air_On': int.parse(firstItem['PS33.Num_Air_On']),
+  //               'PS33.Alarm_Adver': int.parse(firstItem['PS33.Alarm_Adver']),
+  //               'PS01.Algun_Air_On':
+  //                   firstItem['PS01.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS01.Num_Air_On': int.parse(firstItem['PS01.Num_Air_On']),
+  //               'PS01.Alarm_Adver': int.parse(firstItem['PS01.Alarm_Adver']),
+  //               'PS02.Algun_Air_On':
+  //                   firstItem['PS02.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS02.Num_Air_On': int.parse(firstItem['PS02.Num_Air_On']),
+  //               'PS02.Alarm_Adver': int.parse(firstItem['PS02.Alarm_Adver']),
+  //               'PS03.Algun_Air_On':
+  //                   firstItem['PS03.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS03.Num_Air_On': int.parse(firstItem['PS03.Num_Air_On']),
+  //               'PS03.Alarm_Adver': int.parse(firstItem['PS03.Alarm_Adver']),
+  //               'PS07.Algun_Air_On':
+  //                   firstItem['PS07.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS07.Num_Air_On': int.parse(firstItem['PS07.Num_Air_On']),
+  //               'PS07.Alarm_Adver': int.parse(firstItem['PS07.Alarm_Adver']),
+  //               'PS09.Algun_Air_On':
+  //                   firstItem['PS09.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS09.Num_Air_On': int.parse(firstItem['PS09.Num_Air_On']),
+  //               'PS09.Alarm_Adver': int.parse(firstItem['PS09.Alarm_Adver']),
+  //               'PS11.Algun_Air_On':
+  //                   firstItem['PS11.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS11.Num_Air_On': int.parse(firstItem['PS11.Num_Air_On']),
+  //               'PS11.Alarm_Adver': int.parse(firstItem['PS11.Alarm_Adver']),
+  //               'PS13.Algun_Air_On':
+  //                   firstItem['PS13.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS13.Num_Air_On': int.parse(firstItem['PS13.Num_Air_On']),
+  //               'PS13.Alarm_Adver': int.parse(firstItem['PS13.Alarm_Adver']),
+  //               'PS14.Algun_Air_On':
+  //                   firstItem['PS14.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS14.Num_Air_On': int.parse(firstItem['PS14.Num_Air_On']),
+  //               'PS14.Alarm_Adver': int.parse(firstItem['PS14.Alarm_Adver']),
+  //               'PS15.Algun_Air_On':
+  //                   firstItem['PS15.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS15.Num_Air_On': int.parse(firstItem['PS15.Num_Air_On']),
+  //               'PS15.Alarm_Adver': int.parse(firstItem['PS15.Alarm_Adver']),
+  //               'PS16.Algun_Air_On':
+  //                   firstItem['PS16.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS16.Num_Air_On': int.parse(firstItem['PS16.Num_Air_On']),
+  //               'PS16.Alarm_Adver': int.parse(firstItem['PS16.Alarm_Adver']),
+  //               'PS17.Algun_Air_On':
+  //                   firstItem['PS17.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS17.Num_Air_On': int.parse(firstItem['PS17.Num_Air_On']),
+  //               'PS17.Alarm_Adver': int.parse(firstItem['PS17.Alarm_Adver']),
+  //               'PS18.Algun_Air_On':
+  //                   firstItem['PS18.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS18.Num_Air_On': int.parse(firstItem['PS18.Num_Air_On']),
+  //               'PS18.Alarm_Adver': int.parse(firstItem['PS18.Alarm_Adver']),
+  //               'PS19.Algun_Air_On':
+  //                   firstItem['PS19.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS19.Num_Air_On': int.parse(firstItem['PS19.Num_Air_On']),
+  //               'PS19.Alarm_Adver': int.parse(firstItem['PS19.Alarm_Adver']),
+  //               'PS21.Algun_Air_On':
+  //                   firstItem['PS21.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS21.Num_Air_On': int.parse(firstItem['PS21.Num_Air_On']),
+  //               'PS21.Alarm_Adver': int.parse(firstItem['PS21.Alarm_Adver']),
+  //               'PS22.Algun_Air_On':
+  //                   firstItem['PS22.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS22.Num_Air_On': int.parse(firstItem['PS22.Num_Air_On']),
+  //               'PS22.Alarm_Adver': int.parse(firstItem['PS22.Alarm_Adver']),
+  //               'PS23.Algun_Air_On':
+  //                   firstItem['PS23.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS23.Num_Air_On': int.parse(firstItem['PS23.Num_Air_On']),
+  //               'PS23.Alarm_Adver': int.parse(firstItem['PS23.Alarm_Adver']),
+  //               'PS25.Algun_Air_On':
+  //                   firstItem['PS25.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS25.Num_Air_On': int.parse(firstItem['PS25.Num_Air_On']),
+  //               'PS25.Alarm_Adver': int.parse(firstItem['PS25.Alarm_Adver']),
+  //               'PS26.Algun_Air_On':
+  //                   firstItem['PS26.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS26.Num_Air_On': int.parse(firstItem['PS26.Num_Air_On']),
+  //               'PS26.Alarm_Adver': int.parse(firstItem['PS26.Alarm_Adver']),
+  //               'PS28.Algun_Air_On':
+  //                   firstItem['PS28.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS28.Num_Air_On': int.parse(firstItem['PS28.Num_Air_On']),
+  //               'PS28.Alarm_Adver': int.parse(firstItem['PS28.Alarm_Adver']),
+  //               'PS29.Algun_Air_On':
+  //                   firstItem['PS29.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS29.Num_Air_On': int.parse(firstItem['PS29.Num_Air_On']),
+  //               'PS29.Alarm_Adver': int.parse(firstItem['PS29.Alarm_Adver']),
+  //               'PS31.Algun_Air_On':
+  //                   firstItem['PS31.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS31.Num_Air_On': int.parse(firstItem['PS31.Num_Air_On']),
+  //               'PS31.Alarm_Adver': int.parse(firstItem['PS31.Alarm_Adver']),
+  //               'PS32.Algun_Air_On':
+  //                   firstItem['PS32.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS32.Num_Air_On': int.parse(firstItem['PS32.Num_Air_On']),
+  //               'PS32.Alarm_Adver': int.parse(firstItem['PS32.Alarm_Adver']),
+  //               'PS35.Algun_Air_On':
+  //                   firstItem['PS35.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS35.Num_Air_On': int.parse(firstItem['PS35.Num_Air_On']),
+  //               'PS35.Alarm_Adver': int.parse(firstItem['PS35.Alarm_Adver']),
+  //               'PS36.Algun_Air_On':
+  //                   firstItem['PS36.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS36.Num_Air_On': int.parse(firstItem['PS36.Num_Air_On']),
+  //               'PS36.Alarm_Adver': int.parse(firstItem['PS36.Alarm_Adver']),
+  //               'PS37.Algun_Air_On':
+  //                   firstItem['PS37.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS37.Num_Air_On': int.parse(firstItem['PS37.Num_Air_On']),
+  //               'PS37.Alarm_Adver': int.parse(firstItem['PS37.Alarm_Adver']),
+  //               'PS38.Algun_Air_On':
+  //                   firstItem['PS38.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS38.Num_Air_On': int.parse(firstItem['PS38.Num_Air_On']),
+  //               'PS38.Alarm_Adver': int.parse(firstItem['PS38.Alarm_Adver']),
+  //               'PS39.Algun_Air_On':
+  //                   firstItem['PS39.Algun_Air_On'].toLowerCase() == 'true',
+  //               'PS39.Num_Air_On': int.parse(firstItem['PS39.Num_Air_On']),
+  //               'PS39.Alarm_Adver': int.parse(firstItem['PS39.Alarm_Adver']),
+  //               'UDT_DATA_GLOB_Hora_Ini_1_GLOB':
+  //                   firstItem['UDT_DATA_GLOB_Hora_Ini_1_GLOB']?.split('.')[0] ??
+  //                       '00:00:00',
+  //               'UDT_DATA_GLOB_Hora_Fin_2_GLOB':
+  //                   firstItem['UDT_DATA_GLOB_Hora_Fin_2_GLOB']?.split('.')[0] ??
+  //                       '00:00:00',
+  //             });
+
+  //             // Contar cuántas piscinas tienen estado false
+  //             int piscinasOnCount = 0;
+  //             firstItem.forEach((key, value) {
+  //               if (key.endsWith('Num_Air_On') && int.parse(value) > 0) {
+  //                 piscinasOnCount++;
+  //               }
+  //             });
+
+  //             // Crear y agregar el objeto a apiDataListOffAntenas
+  //             apiDataListOnPs.add({
+  //               'PiscinasOn': piscinasOnCount.toString(),
+  //             });
+
+  //             // Antenas //
+
+  //             apiDataListAntenas.add({
+  //               'Pot_TA03-1': int.parse(itemAntenas['Pot_TA03-1']),
+  //               'Pot_TA01-1': int.parse(itemAntenas['Pot_TA01-1']),
+  //               'Pot_TA01-2': int.parse(itemAntenas['Pot_TA01-2']),
+  //               'Pot_TA117-1': int.parse(itemAntenas['Pot_TA117-1']),
+  //               'Pot_TA02-1': int.parse(itemAntenas['Pot_TA02-1']),
+  //               'Pot_TA10-1': int.parse(itemAntenas['Pot_TA10-1']),
+  //               'Pot_TA02-2': int.parse(itemAntenas['Pot_TA02-2']),
+  //               'Pot_TA103-1': int.parse(itemAntenas['Pot_TA103-1']),
+  //               'Pot_TA104-1': int.parse(itemAntenas['Pot_TA104-1']),
+  //               'Pot_TA04-1': int.parse(itemAntenas['Pot_TA04-1']),
+  //               'Pot_TA16-1': int.parse(itemAntenas['Pot_TA16-1']),
+  //               'Pot_TA05-1': int.parse(itemAntenas['Pot_TA05-1']),
+  //               'Pot_TA106-1': int.parse(itemAntenas['Pot_TA106-1']),
+  //               'Pot_TA05-2': int.parse(itemAntenas['Pot_TA05-2']),
+  //               'Pot_TA11-1': int.parse(itemAntenas['Pot_TA11-1']),
+  //               'Pot_TA06-1': int.parse(itemAntenas['Pot_TA06-1']),
+  //               'Pot_TA102-1': int.parse(itemAntenas['Pot_TA102-1']),
+  //               'Pot_TA07-1': int.parse(itemAntenas['Pot_TA07-1']),
+  //               'Pot_TA08-1': int.parse(itemAntenas['Pot_TA08-1']),
+  //               'Pot_TA111-1': int.parse(itemAntenas['Pot_TA111-1']),
+  //               'Pot_TA09-1': int.parse(itemAntenas['Pot_TA09-1']),
+  //               'Pot_TA42-2': int.parse(itemAntenas['Pot_TA42-2']),
+  //               'Pot_TA115-1': int.parse(itemAntenas['Pot_TA115-1']),
+  //               'Pot_TA101-1': int.parse(itemAntenas['Pot_TA101-1']),
+  //               'Pot_TA107-1': int.parse(itemAntenas['Pot_TA107-1']),
+  //               'Pot_TA108-1': int.parse(itemAntenas['Pot_TA108-1']),
+  //               'Pot_TA113-1': int.parse(itemAntenas['Pot_TA113-1']),
+  //               'Pot_TA114-1': int.parse(itemAntenas['Pot_TA114-1']),
+  //               'Pot_TA116-1': int.parse(itemAntenas['Pot_TA116-1']),
+  //               'Pot_TA13-1': int.parse(itemAntenas['Pot_TA13-1']),
+  //               'Pot_TA14-1': int.parse(itemAntenas['Pot_TA14-1']),
+  //               'Pot_TA15-1': int.parse(itemAntenas['Pot_TA15-1']),
+  //               'Pot_TA17-1': int.parse(itemAntenas['Pot_TA17-1']),
+  //               'Pot_TA18-1': int.parse(itemAntenas['Pot_TA18-1']),
+  //               'Pot_TA19-1': int.parse(itemAntenas['Pot_TA19-1']),
+  //               'Pot_TA20-1': int.parse(itemAntenas['Pot_TA20-1']),
+  //               'Pot_TA21-1': int.parse(itemAntenas['Pot_TA21-1']),
+  //               'Pot_TA22-1': int.parse(itemAntenas['Pot_TA22-1']),
+  //               'Pot_TA23-1': int.parse(itemAntenas['Pot_TA23-1']),
+  //               'Pot_TA23-2': int.parse(itemAntenas['Pot_TA23-2']),
+  //               'Pot_TA24-1': int.parse(itemAntenas['Pot_TA24-1']),
+  //               'Pot_TA24-2': int.parse(itemAntenas['Pot_TA24-2']),
+  //               'Pot_TA25-1': int.parse(itemAntenas['Pot_TA25-1']),
+  //               'Pot_TA26-1': int.parse(itemAntenas['Pot_TA26-1']),
+  //               'Pot_TA27-1': int.parse(itemAntenas['Pot_TA27-1']),
+  //               'Pot_TA27-2': int.parse(itemAntenas['Pot_TA27-2']),
+  //               'Pot_TA28-1': int.parse(itemAntenas['Pot_TA28-1']),
+  //               'Pot_TA29-1': int.parse(itemAntenas['Pot_TA29-1']),
+  //               'Pot_TA30-1': int.parse(itemAntenas['Pot_TA30-1']),
+  //               'Pot_TA30-2': int.parse(itemAntenas['Pot_TA30-2']),
+  //               'Pot_TA31-1': int.parse(itemAntenas['Pot_TA31-1']),
+  //               'Pot_TA32-1': int.parse(itemAntenas['Pot_TA32-1']),
+  //               'Pot_TA33-1': int.parse(itemAntenas['Pot_TA33-1']),
+  //               'Pot_TA34-1': int.parse(itemAntenas['Pot_TA34-1']),
+  //               'Pot_TA35-1': int.parse(itemAntenas['Pot_TA35-1']),
+  //               'Pot_TA36-1': int.parse(itemAntenas['Pot_TA36-1']),
+  //               'Pot_TA37-1': int.parse(itemAntenas['Pot_TA37-1']),
+  //               'Pot_TA38-1': int.parse(itemAntenas['Pot_TA38-1']),
+  //               'Pot_TA38-2': int.parse(itemAntenas['Pot_TA38-2']),
+  //               'Pot_TA39-1': int.parse(itemAntenas['Pot_TA39-1']),
+  //               'Pot_TA39-2': int.parse(itemAntenas['Pot_TA39-2']),
+  //               'Pot_TA40-1': int.parse(itemAntenas['Pot_TA40-1']),
+  //               'Pot_TA40-2': int.parse(itemAntenas['Pot_TA40-2']),
+  //               'Pot_TA41-1': int.parse(itemAntenas['Pot_TA41-1']),
+  //               'Pot_TA41-2': int.parse(itemAntenas['Pot_TA41-2']),
+  //               'Pot_TA42-1': int.parse(itemAntenas['Pot_TA42-1']),
+  //               'Pot_TA43-1': int.parse(itemAntenas['Pot_TA43-1']),
+  //               'Pot_TA43-2': int.parse(itemAntenas['Pot_TA43-2']),
+  //               'Pot_TA44-1': int.parse(itemAntenas['Pot_TA44-1']),
+  //               'Pot_TA45-1': int.parse(itemAntenas['Pot_TA45-1']),
+  //               'Pot_TA46-1': int.parse(itemAntenas['Pot_TA46-1']),
+  //               'Pot_TA47-1': int.parse(itemAntenas['Pot_TA47-1']),
+  //               'Pot_TA47B-1': int.parse(itemAntenas['Pot_TA47B-1']),
+  //               'Pot_TA48-1': int.parse(itemAntenas['Pot_TA48-1']),
+  //               'Pot_TA49-1': int.parse(itemAntenas['Pot_TA49-1']),
+  //               'Pot_TA50-1': int.parse(itemAntenas['Pot_TA50-1']),
+  //               'Pot_TA51-1': int.parse(itemAntenas['Pot_TA51-1']),
+  //               'Pot_TA52-1': int.parse(itemAntenas['Pot_TA52-1']),
+  //               'Pot_TA53-1': int.parse(itemAntenas['Pot_TA53-1']),
+  //               'Pot_TA54-1': int.parse(itemAntenas['Pot_TA54-1']),
+  //               'Pot_TA55-1': int.parse(itemAntenas['Pot_TA55-1']),
+  //               'Pot_TA56-1': int.parse(itemAntenas['Pot_TA56-1']),
+  //               'Pot_TA57-1': int.parse(itemAntenas['Pot_TA57-1']),
+  //               'Pot_TA58-1': int.parse(itemAntenas['Pot_TA58-1']),
+  //               'Pot_AP1-B': int.parse(itemAntenas['Pot_AP1-B']),
+  //               'Pot_AP1': int.parse(itemAntenas['Pot-AP1']),
+  //               'Pot_AP2': int.parse(itemAntenas['Pot-AP2']),
+  //               'Pot_AP3': int.parse(itemAntenas['Pot-AP3']),
+  //               'Pot_Camp-PTP-Mari':
+  //                   int.parse(itemAntenas['Pot_Camp-PTP-Mari']),
+  //               'Pot_EB_G1': int.parse(itemAntenas['Pot_EB_G1']),
+  //               // 'Pot_EB_G2': int.parse(itemAntenas['Pot_EB_G2']),
+  //               'Pot_PTP-Camp-T1': int.parse(itemAntenas['Pot_PTP-Camp-T1']),
+  //               'Pot_PTP-Camp-T2': int.parse(itemAntenas['Pot_PTP-Camp-T2']),
+  //               'Pot_PTP-Camp-T3': int.parse(itemAntenas['Pot_PTP-Camp-T3']),
+  //               'Pot_PTP-Mari': int.parse(itemAntenas['Pot_PTP-Mari']),
+  //               'Pot_PTP-T1': int.parse(itemAntenas['Pot_PTP-T1']),
+  //               'Pot_PTP-T2': int.parse(itemAntenas['Pot_PTP-T2']),
+  //               'Pot_PTP-T3': int.parse(itemAntenas['Pot_PTP-T3']),
+  //               'Stat_TA13-1': itemAntenas['Stat_TA13-1'] == "TRUE",
+  //               'Stat_TA39-2': itemAntenas['Stat_TA39-2'] == "TRUE",
+  //               'Stat_TA114-1': itemAntenas['Stat_TA114-1'] == "TRUE",
+  //               'Stat_TA37-1': itemAntenas['Stat_TA37-1'] == "TRUE",
+  //               'Stat_TA01-1': itemAntenas['Stat_TA01-1'] == "TRUE",
+  //               'Stat_TA49-1': itemAntenas['Stat_TA49-1'] == "TRUE",
+  //               'Stat_TA01-2': itemAntenas['Stat_TA01-2'] == "TRUE",
+  //               'Stat_TA15-1': itemAntenas['Stat_TA15-1'] == "TRUE",
+  //               'Stat_TA40-2': itemAntenas['Stat_TA40-2'] == "TRUE",
+  //               'Stat_TA115-1': itemAntenas['Stat_TA115-1'] == "TRUE",
+  //               'Stat_TA02-1': itemAntenas['Stat_TA02-1'] == "TRUE",
+  //               'Stat_TA02-2': itemAntenas['Stat_TA02-2'] == "TRUE",
+  //               'Stat_TA03-1': itemAntenas['Stat_TA03-1'] == "TRUE",
+  //               'Stat_TA101-1': itemAntenas['Stat_TA101-1'] == "TRUE",
+  //               'Stat_TA104-1': itemAntenas['Stat_TA104-1'] == "TRUE",
+  //               'Stat_TA07-1': itemAntenas['Stat_TA07-1'] == "TRUE",
+
+  //               'Stat_TA29-1': itemAntenas['Stat_TA29-1'] == "TRUE",
+  //               'Stat_TA04-1': itemAntenas['Stat_TA04-1'] == "TRUE",
+  //               'Stat_TA42-2': itemAntenas['Stat_TA42-2'] == "TRUE",
+  //               'Stat_TA14-1': itemAntenas['Stat_TA14-1'] == "TRUE",
+  //               'Stat_TA05-1': itemAntenas['Stat_TA05-1'] == "TRUE",
+  //               'Stat_TA05-2': itemAntenas['Stat_TA05-2'] == "TRUE",
+  //               'Stat_TA17-1': itemAntenas['Stat_TA17-1'] == "TRUE",
+  //               'Stat_PTP-Camp-T3': itemAntenas['Stat_PTP-Camp-T3'] == "TRUE",
+  //               'Stat_TA06-1': itemAntenas['Stat_TA06-1'] == "TRUE",
+  //               'Stat_TA107-1': itemAntenas['Stat_TA107-1'] == "TRUE",
+  //               'Stat_TA32-1': itemAntenas['Stat_TA32-1'] == "TRUE",
+  //               'Stat_TA45-1': itemAntenas['Stat_TA45-1'] == "TRUE",
+  //               'Stat_TA08-1': itemAntenas['Stat_TA08-1'] == "TRUE",
+  //               'Stat_TA18-1': itemAntenas['Stat_TA18-1'] == "TRUE",
+  //               'Stat_TA09-1': itemAntenas['Stat_TA09-1'] == "TRUE",
+  //               'Stat_TA10-1': itemAntenas['Stat_TA10-1'] == "TRUE",
+  //               'Stat_TA102-1': itemAntenas['Stat_TA102-1'] == "TRUE",
+  //               'Stat_TA103-1': itemAntenas['Stat_TA103-1'] == "TRUE",
+  //               'Stat_TA106-1': itemAntenas['Stat_TA106-1'] == "TRUE",
+  //               'Stat_TA108-1': itemAntenas['Stat_TA108-1'] == "TRUE",
+  //               'Stat_TA11-1': itemAntenas['Stat_TA11-1'] == "TRUE",
+  //               'Stat_TA111-1': itemAntenas['Stat_TA111-1'] == "TRUE",
+  //               'Stat_TA113-1': itemAntenas['Stat_TA113-1'] == "TRUE",
+  //               'Stat_TA116-1': itemAntenas['Stat_TA116-1'] == "TRUE",
+  //               'Stat_TA117-1': itemAntenas['Stat_TA117-1'] == "TRUE",
+  //               'Stat_TA16-1': itemAntenas['Stat_TA16-1'] == "TRUE",
+  //               'Stat_TA19-1': itemAntenas['Stat_TA19-1'] == "TRUE",
+  //               'Stat_TA20-1': itemAntenas['Stat_TA20-1'] == "TRUE",
+  //               'Stat_TA21-1': itemAntenas['Stat_TA21-1'] == "TRUE",
+  //               'Stat_TA22-1': itemAntenas['Stat_TA22-1'] == "TRUE",
+  //               'Stat_TA23-1': itemAntenas['Stat_TA23-1'] == "TRUE",
+  //               'Stat_TA23-2': itemAntenas['Stat_TA23-2'] == "TRUE",
+  //               'Stat_TA24-1': itemAntenas['Stat_TA24-1'] == "TRUE",
+  //               'Stat_TA24-2': itemAntenas['Stat_TA24-2'] == "TRUE",
+  //               'Stat_TA25-1': itemAntenas['Stat_TA25-1'] == "TRUE",
+  //               'Stat_TA26-1': itemAntenas['Stat_TA26-1'] == "TRUE",
+  //               'Stat_TA27-1': itemAntenas['Stat_TA27-1'] == "TRUE",
+  //               'Stat_TA27-2': itemAntenas['Stat_TA27-2'] == "TRUE",
+  //               'Stat_TA28-1': itemAntenas['Stat_TA28-1'] == "TRUE",
+  //               'Stat_TA30-1': itemAntenas['Stat_TA30-1'] == "TRUE",
+  //               'Stat_TA30-2': itemAntenas['Stat_TA30-2'] == "TRUE",
+  //               'Stat_TA31-1': itemAntenas['Stat_TA31-1'] == "TRUE",
+  //               'Stat_TA33-1': itemAntenas['Stat_TA33-1'] == "TRUE",
+  //               'Stat_TA34-1': itemAntenas['Stat_TA34-1'] == "TRUE",
+  //               'Stat_TA35-1': itemAntenas['Stat_TA35-1'] == "TRUE",
+  //               'Stat_TA36-1': itemAntenas['Stat_TA36-1'] == "TRUE",
+  //               'Stat_TA38-1': itemAntenas['Stat_TA38-1'] == "TRUE",
+  //               'Stat_TA38-2': itemAntenas['Stat_TA38-2'] == "TRUE",
+  //               'Stat_TA39-1': itemAntenas['Stat_TA39-1'] == "TRUE",
+  //               'Stat_TA40-1': itemAntenas['Stat_TA40-1'] == "TRUE",
+  //               'Stat_TA41-1': itemAntenas['Stat_TA41-1'] == "TRUE",
+  //               'Stat_TA41-2': itemAntenas['Stat_TA41-2'] == "TRUE",
+  //               'Stat_TA42-1': itemAntenas['Stat_TA42-1'] == "TRUE",
+  //               'Stat_TA43-1': itemAntenas['Stat_TA43-1'] == "TRUE",
+  //               'Stat_TA43-2': itemAntenas['Stat_TA43-2'] == "TRUE",
+  //               'Stat_TA44-1': itemAntenas['Stat_TA44-1'] == "TRUE",
+  //               'Stat_TA46-1': itemAntenas['Stat_TA46-1'] == "TRUE",
+  //               'Stat_TA47-1': itemAntenas['Stat_TA47-1'] == "TRUE",
+  //               'Stat_TA47B-1': itemAntenas['Stat_TA47B-1'] == "TRUE",
+  //               'Stat_TA48-1': itemAntenas['Stat_TA48-1'] == "TRUE",
+  //               'Stat_TA50-1': itemAntenas['Stat_TA50-1'] == "TRUE",
+  //               'Stat_TA51-1': itemAntenas['Stat_TA51-1'] == "TRUE",
+  //               'Stat_TA52-1': itemAntenas['Stat_TA52-1'] == "TRUE",
+  //               'Stat_TA53-1': itemAntenas['Stat_TA53-1'] == "TRUE",
+  //               'Stat_TA54-1': itemAntenas['Stat_TA54-1'] == "TRUE",
+  //               'Stat_TA55-1': itemAntenas['Stat_TA55-1'] == "TRUE",
+  //               'Stat_TA56-1': itemAntenas['Stat_TA56-1'] == "TRUE",
+  //               'Stat_TA57-1': itemAntenas['Stat_TA57-1'] == "TRUE",
+  //               'Stat_TA58-1': itemAntenas['Stat_TA58-1'] == "TRUE",
+  //               'Stat_AP1': itemAntenas['Stat_AP1'] == "TRUE",
+  //               'Stat_AP1-B': itemAntenas['Stat_AP1-B'] == "TRUE",
+  //               'Stat_AP2': itemAntenas['Stat_AP2'] == "TRUE",
+  //               'Stat_AP3': itemAntenas['Stat_AP3'] == "TRUE",
+  //               'Stat_Camp-PTP-Mari':
+  //                   itemAntenas['Stat_Camp-PTP-Mari'] == "TRUE",
+  //               'Stat_PTP-T1': itemAntenas['Stat_PTP-T1'] == "TRUE",
+  //               'Stat_PTP-T2': itemAntenas['Stat_PTP-T2'] == "TRUE",
+  //               'Stat_PTP-T3': itemAntenas['Stat_PTP-T3'] == "TRUE",
+  //               'Stat_EB_G1': itemAntenas['Stat_EB_G1'] == "TRUE",
+  //               'Stat_EB_G2': itemAntenas['Stat_EB_G2'] == "TRUE",
+  //               'Stat_PTP-Camp-T1': itemAntenas['Stat_PTP-Camp-T1'] == "TRUE",
+  //               'Stat_PTP-Camp-T2': itemAntenas['Stat_PTP-Camp-T2'] == "TRUE",
+  //             });
+
+  //             // Contar cuántas piscinas tienen estado false
+  //             int antenasOffCount = 0;
+  //             itemAntenas.forEach((key, value) {
+  //               // print(value);
+  //               if (key.startsWith('Stat') && value == 'FALSE') {
+  //                 antenasOffCount++;
+  //               }
+  //             });
+
+  //             // Crear y agregar el objeto a apiDataListOffAntenas
+  //             apiDataListOffAntenas.add({
+  //               'AntenasOff': antenasOffCount.toString(),
+  //             });
+
+  //             _apiDataListInfoGeneralPis.addAll([
+  //               apiDataList,
+  //               apiDataListOnPs,
+  //               apiDataListAntenas,
+  //               apiDataListOffAntenas
+  //             ]);
+
+  //             // print(_apiDataListInfoGeneralPis[1][0]);
+
+  //             isLoading2 = false; // Finalizar el estado de cargando
+  //             notifyListeners();
+  //             // print(isLoading2);
+  //             // print(_apiDataListPS01)
+  //           }
+  //         }, onError: (error) {
+  //           isLoading2 = false; // Finalizar el estado de cargando
+  //           _hasError = true; // Activar el estado de error
+  //           // _errorMessage = error.toString(); // Almacenar mensaje de error
+  //           // print('aaerrrrorrrrr');
+  //           notifyListeners();
+  //         });
+  //       } else {}
+  //     } catch (e) {
+  //       // print('aaerrrrorrrrr');
+  //     }
+  //   }
+  // }
+
   void subscribePiscinasAntenasAndInfoGeneral() {
-    isLoading2 = true; // Comenzar el estado de cargando
-    _hasError = false; // Reiniciar el estado de error
+    isLoading2 = true;
+    _hasError = false;
 
     _subscribeTo('InfoGeneralPS');
     notifyListeners();
 
-    // print('qqqqq');
-
     if (subscriptionInfoGeneralPis == null) {
-      // _apiDataListInfoGeneralPisSaved.add(_apiDataListInfoGeneralPis);
       notifyListeners();
-      // print('Eliminandoooo');
       _apiDataListInfoGeneralPis.clear();
       List<Map<dynamic, dynamic>> apiDataList = [];
       List<Map<dynamic, dynamic>> apiDataListOnPs = [];
@@ -11800,7 +12680,6 @@ class PiscinasJosefinaProvider extends ChangeNotifier {
       try {
         if (_broadcastStream != null) {
           subscriptionInfoGeneralPis = _broadcastStream!.listen((event) {
-            // print('Aquiii');
             apiDataList.clear();
             apiDataListOnPs.clear();
             apiDataListAntenas.clear();
@@ -11808,567 +12687,294 @@ class PiscinasJosefinaProvider extends ChangeNotifier {
 
             final decodedEvent = json.decode(event);
             if (decodedEvent.containsKey('InfoGeneralPS')) {
+              // Verificar si todos los datos necesarios están presentes
+              if (!_datosCompletos(decodedEvent)) {
+                isLoading2 =
+                    true; // Mantener en estado de carga si los datos están incompletos
+                return; // No procesar datos incompletos
+              }
+
               dynamic firstItem = decodedEvent['InfoGeneralPS'][0];
               dynamic itemAntenas = decodedEvent['Antenas'][0];
 
-              apiDataList.add({
-                'PS06.Algun_Air_On':
-                    firstItem['PS06.Algun_Air_On'].toLowerCase() == 'true',
-                'PS06.Num_Air_On': int.parse(firstItem['PS06.Num_Air_On']),
-                'PS06.Alarm_Adver': int.parse(firstItem['PS06.Alarm_Adver']),
-                'PC103.Algun_Air_On':
-                    firstItem['PC103.Algun_Air_On'].toLowerCase() == 'true',
-                'PC103.Num_Air_On': int.parse(firstItem['PC103.Num_Air_On']),
-                'PC103.Alarm_Adver': int.parse(firstItem['PC103.Alarm_Adver']),
-
-                'PC104.Algun_Air_On':
-                    firstItem['PC104.Algun_Air_On'].toLowerCase() == 'true',
-                'PC104.Num_Air_On': int.parse(firstItem['PC104.Num_Air_On']),
-                'PC104.Alarm_Adver': int.parse(firstItem['PC104.Alarm_Adver']),
-
-                'PC107.Algun_Air_On':
-                    firstItem['PC107.Algun_Air_On'].toLowerCase() == 'true',
-                'PC107.Num_Air_On': int.parse(firstItem['PC107.Num_Air_On']),
-                'PC107.Alarm_Adver': int.parse(firstItem['PC107.Alarm_Adver']),
-
-                'PS30.Algun_Air_On':
-                    firstItem['PS30.Algun_Air_On'].toLowerCase() == 'true',
-                'PS30.Num_Air_On': int.parse(firstItem['PS30.Num_Air_On']),
-                'PS30.Alarm_Adver': int.parse(firstItem['PS30.Alarm_Adver']),
-                'PS04.Algun_Air_On':
-                    firstItem['PS04.Algun_Air_On'].toLowerCase() == 'true',
-                'PS04.Num_Air_On': int.parse(firstItem['PS04.Num_Air_On']),
-                'PS04.Alarm_Adver': int.parse(firstItem['PS04.Alarm_Adver']),
-                'PC101.Algun_Air_On':
-                    firstItem['PC101.Algun_Air_On'].toLowerCase() == 'true',
-                'PC101.Num_Air_On': int.parse(firstItem['PC101.Num_Air_On']),
-                'PC101.Alarm_Adver': int.parse(firstItem['PC101.Alarm_Adver']),
-                'PS27.Algun_Air_On':
-                    firstItem['PS27.Algun_Air_On'].toLowerCase() == 'true',
-                'PS27.Num_Air_On': int.parse(firstItem['PS27.Num_Air_On']),
-                'PS27.Alarm_Adver': int.parse(firstItem['PS27.Alarm_Adver']),
-                'PS40.Algun_Air_On':
-                    firstItem['PS40.Algun_Air_On'].toLowerCase() == 'true',
-                'PS40.Num_Air_On': int.parse(firstItem['PS40.Num_Air_On']),
-                'PS40.Alarm_Adver': int.parse(firstItem['PS40.Alarm_Adver']),
-                'PS41.Algun_Air_On':
-                    firstItem['PS41.Algun_Air_On'].toLowerCase() == 'true',
-                'PS41.Num_Air_On': int.parse(firstItem['PS41.Num_Air_On']),
-                'PS41.Alarm_Adver': int.parse(firstItem['PS41.Alarm_Adver']),
-                'PS42.Algun_Air_On':
-                    firstItem['PS42.Algun_Air_On'].toLowerCase() == 'true',
-                'PS42.Num_Air_On': int.parse(firstItem['PS42.Num_Air_On']),
-                'PS42.Alarm_Adver': int.parse(firstItem['PS42.Alarm_Adver']),
-                'PS43.Algun_Air_On':
-                    firstItem['PS43.Algun_Air_On'].toLowerCase() == 'true',
-                'PS43.Num_Air_On': int.parse(firstItem['PS43.Num_Air_On']),
-                'PS43.Alarm_Adver': int.parse(firstItem['PS43.Alarm_Adver']),
-                'PS44.Algun_Air_On':
-                    firstItem['PS44.Algun_Air_On'].toLowerCase() == 'true',
-                'PS44.Num_Air_On': int.parse(firstItem['PS44.Num_Air_On']),
-                'PS44.Alarm_Adver': int.parse(firstItem['PS44.Alarm_Adver']),
-                'PS45.Algun_Air_On':
-                    firstItem['PS45.Algun_Air_On'].toLowerCase() == 'true',
-                'PS45.Num_Air_On': int.parse(firstItem['PS45.Num_Air_On']),
-                'PS45.Alarm_Adver': int.parse(firstItem['PS45.Alarm_Adver']),
-                'PS46.Algun_Air_On':
-                    firstItem['PS46.Algun_Air_On'].toLowerCase() == 'true',
-                'PS46.Num_Air_On': int.parse(firstItem['PS46.Num_Air_On']),
-                'PS46.Alarm_Adver': int.parse(firstItem['PS46.Alarm_Adver']),
-                'PS47.Algun_Air_On':
-                    firstItem['PS47.Algun_Air_On'].toLowerCase() == 'true',
-                'PS47.Num_Air_On': int.parse(firstItem['PS47.Num_Air_On']),
-                'PS47.Alarm_Adver': int.parse(firstItem['PS47.Alarm_Adver']),
-                'PS47B.Algun_Air_On':
-                    firstItem['PS47B.Algun_Air_On'].toLowerCase() == 'true',
-                'PS47B.Num_Air_On': int.parse(firstItem['PS47B.Num_Air_On']),
-                'PS47B.Alarm_Adver': int.parse(firstItem['PS47B.Alarm_Adver']),
-                'PS48.Algun_Air_On':
-                    firstItem['PS48.Algun_Air_On'].toLowerCase() == 'true',
-                'PS48.Num_Air_On': int.parse(firstItem['PS48.Num_Air_On']),
-                'PS48.Alarm_Adver': int.parse(firstItem['PS48.Alarm_Adver']),
-                'PS49.Algun_Air_On':
-                    firstItem['PS49.Algun_Air_On'].toLowerCase() == 'true',
-                'PS49.Num_Air_On': int.parse(firstItem['PS49.Num_Air_On']),
-                'PS49.Alarm_Adver': int.parse(firstItem['PS49.Alarm_Adver']),
-                'PS50.Algun_Air_On':
-                    firstItem['PS50.Algun_Air_On'].toLowerCase() == 'true',
-                'PS50.Num_Air_On': int.parse(firstItem['PS50.Num_Air_On']),
-                'PS50.Alarm_Adver': int.parse(firstItem['PS50.Alarm_Adver']),
-                'PS51.Algun_Air_On':
-                    firstItem['PS51.Algun_Air_On'].toLowerCase() == 'true',
-                'PS51.Num_Air_On': int.parse(firstItem['PS51.Num_Air_On']),
-                'PS51.Alarm_Adver': int.parse(firstItem['PS51.Alarm_Adver']),
-                'PS52.Algun_Air_On':
-                    firstItem['PS52.Algun_Air_On'].toLowerCase() == 'true',
-                'PS52.Num_Air_On': int.parse(firstItem['PS52.Num_Air_On']),
-                'PS52.Alarm_Adver': int.parse(firstItem['PS52.Alarm_Adver']),
-                'PS53.Algun_Air_On':
-                    firstItem['PS53.Algun_Air_On'].toLowerCase() == 'true',
-                'PS53.Num_Air_On': int.parse(firstItem['PS53.Num_Air_On']),
-                'PS53.Alarm_Adver': int.parse(firstItem['PS53.Alarm_Adver']),
-                'PS54.Algun_Air_On':
-                    firstItem['PS54.Algun_Air_On'].toLowerCase() == 'true',
-                'PS54.Num_Air_On': int.parse(firstItem['PS54.Num_Air_On']),
-                'PS54.Alarm_Adver': int.parse(firstItem['PS54.Alarm_Adver']),
-                'PS55.Algun_Air_On':
-                    firstItem['PS55.Algun_Air_On'].toLowerCase() == 'true',
-                'PS55.Num_Air_On': int.parse(firstItem['PS55.Num_Air_On']),
-                'PS55.Alarm_Adver': int.parse(firstItem['PS55.Alarm_Adver']),
-                'PS56.Algun_Air_On':
-                    firstItem['PS56.Algun_Air_On'].toLowerCase() == 'true',
-                'PS56.Num_Air_On': int.parse(firstItem['PS56.Num_Air_On']),
-                'PS56.Alarm_Adver': int.parse(firstItem['PS56.Alarm_Adver']),
-                'PS57.Algun_Air_On':
-                    firstItem['PS57.Algun_Air_On'].toLowerCase() == 'true',
-                'PS57.Num_Air_On': int.parse(firstItem['PS57.Num_Air_On']),
-                'PS57.Alarm_Adver': int.parse(firstItem['PS57.Alarm_Adver']),
-                'PS58.Algun_Air_On':
-                    firstItem['PS58.Algun_Air_On'].toLowerCase() == 'true',
-                'PS58.Num_Air_On': int.parse(firstItem['PS58.Num_Air_On']),
-                'PS58.Alarm_Adver': int.parse(firstItem['PS58.Alarm_Adver']),
-                'PS05.Algun_Air_On':
-                    firstItem['PS05.Algun_Air_On'].toLowerCase() == 'true',
-                'PS05.Num_Air_On': int.parse(firstItem['PS05.Num_Air_On']),
-                'PS05.Alarm_Adver': int.parse(firstItem['PS05.Alarm_Adver']),
-                'PC102.Algun_Air_On':
-                    firstItem['PC102.Algun_Air_On'].toLowerCase() == 'true',
-                'PC102.Num_Air_On': int.parse(firstItem['PC102.Num_Air_On']),
-                'PC102.Alarm_Adver': int.parse(firstItem['PC102.Alarm_Adver']),
-                'PC20.Algun_Air_On':
-                    firstItem['PC20.Algun_Air_On'].toLowerCase() == 'true',
-                'PC20.Num_Air_On': int.parse(firstItem['PC20.Num_Air_On']),
-                'PC20.Alarm_Adver': int.parse(firstItem['PC20.Alarm_Adver']),
-                'PC106.Algun_Air_On':
-                    firstItem['PC106.Algun_Air_On'].toLowerCase() == 'true',
-                'PC106.Num_Air_On': int.parse(firstItem['PC106.Num_Air_On']),
-                'PC106.Alarm_Adver': int.parse(firstItem['PC106.Alarm_Adver']),
-                'PC108.Algun_Air_On':
-                    firstItem['PC108.Algun_Air_On'].toLowerCase() == 'true',
-                'PC108.Num_Air_On': int.parse(firstItem['PC108.Num_Air_On']),
-                'PC108.Alarm_Adver': int.parse(firstItem['PC108.Alarm_Adver']),
-                'PC111.Algun_Air_On':
-                    firstItem['PC111.Algun_Air_On'].toLowerCase() == 'true',
-                'PC111.Num_Air_On': int.parse(firstItem['PC111.Num_Air_On']),
-                'PC111.Alarm_Adver': int.parse(firstItem['PC111.Alarm_Adver']),
-                'PC113.Algun_Air_On':
-                    firstItem['PC113.Algun_Air_On'].toLowerCase() == 'true',
-                'PC113.Num_Air_On': int.parse(firstItem['PC113.Num_Air_On']),
-                'PC113.Alarm_Adver': int.parse(firstItem['PC113.Alarm_Adver']),
-                'PC114.Algun_Air_On':
-                    firstItem['PC114.Algun_Air_On'].toLowerCase() == 'true',
-                'PC114.Num_Air_On': int.parse(firstItem['PC114.Num_Air_On']),
-                'PC114.Alarm_Adver': int.parse(firstItem['PC114.Alarm_Adver']),
-                'PC115.Algun_Air_On':
-                    firstItem['PC115.Algun_Air_On'].toLowerCase() == 'true',
-                'PC115.Num_Air_On': int.parse(firstItem['PC115.Num_Air_On']),
-                'PC115.Alarm_Adver': int.parse(firstItem['PC115.Alarm_Adver']),
-                'PS08.Algun_Air_On':
-                    firstItem['PS08.Algun_Air_On'].toLowerCase() == 'true',
-                'PS08.Num_Air_On': int.parse(firstItem['PS08.Num_Air_On']),
-                'PS08.Alarm_Adver': int.parse(firstItem['PS08.Alarm_Adver']),
-                'PC116.Algun_Air_On':
-                    firstItem['PC116.Algun_Air_On'].toLowerCase() == 'true',
-                'PC116.Num_Air_On': int.parse(firstItem['PC116.Num_Air_On']),
-                'PC116.Alarm_Adver': int.parse(firstItem['PC116.Alarm_Adver']),
-
-                'PS34.Algun_Air_On':
-                    firstItem['PS34.Algun_Air_On'].toLowerCase() == 'true',
-                'PS34.Num_Air_On': int.parse(firstItem['PS34.Num_Air_On']),
-                'PS34.Alarm_Adver': int.parse(firstItem['PS34.Alarm_Adver']),
-                'PC117.Algun_Air_On':
-                    firstItem['PC117.Algun_Air_On'].toLowerCase() == 'true',
-                'PC117.Num_Air_On': int.parse(firstItem['PC117.Num_Air_On']),
-                'PC117.Alarm_Adver': int.parse(firstItem['PC117.Alarm_Adver']),
-                'PS24.Algun_Air_On':
-                    firstItem['PS24.Algun_Air_On'].toLowerCase() == 'true',
-                'PS24.Num_Air_On': int.parse(firstItem['PS24.Num_Air_On']),
-                'PS24.Alarm_Adver': int.parse(firstItem['PS24.Alarm_Adver']),
-                //   'PC117.Algun_Air_On':
-                //       firstItem['PC117.Algun_Air_On'].toLowerCase() == 'true',
-                //   'PC117.Num_Air_On': int.parse(firstItem['PC117.Num_Air_On']),
-                //   'PC117.Alarm_Adver': int.parse(firstItem['PC117.Alarm_Adver']),
-
-                'PS10.Algun_Air_On':
-                    firstItem['PS10.Algun_Air_On'].toLowerCase() == 'true',
-                'PS10.Num_Air_On': int.parse(firstItem['PS10.Num_Air_On']),
-                'PS10.Alarm_Adver': int.parse(firstItem['PS10.Alarm_Adver']),
-                'PS33.Algun_Air_On':
-                    firstItem['PS33.Algun_Air_On'].toLowerCase() == 'true',
-                'PS33.Num_Air_On': int.parse(firstItem['PS33.Num_Air_On']),
-                'PS33.Alarm_Adver': int.parse(firstItem['PS33.Alarm_Adver']),
-                'PS01.Algun_Air_On':
-                    firstItem['PS01.Algun_Air_On'].toLowerCase() == 'true',
-                'PS01.Num_Air_On': int.parse(firstItem['PS01.Num_Air_On']),
-                'PS01.Alarm_Adver': int.parse(firstItem['PS01.Alarm_Adver']),
-                'PS02.Algun_Air_On':
-                    firstItem['PS02.Algun_Air_On'].toLowerCase() == 'true',
-                'PS02.Num_Air_On': int.parse(firstItem['PS02.Num_Air_On']),
-                'PS02.Alarm_Adver': int.parse(firstItem['PS02.Alarm_Adver']),
-                'PS03.Algun_Air_On':
-                    firstItem['PS03.Algun_Air_On'].toLowerCase() == 'true',
-                'PS03.Num_Air_On': int.parse(firstItem['PS03.Num_Air_On']),
-                'PS03.Alarm_Adver': int.parse(firstItem['PS03.Alarm_Adver']),
-                'PS07.Algun_Air_On':
-                    firstItem['PS07.Algun_Air_On'].toLowerCase() == 'true',
-                'PS07.Num_Air_On': int.parse(firstItem['PS07.Num_Air_On']),
-                'PS07.Alarm_Adver': int.parse(firstItem['PS07.Alarm_Adver']),
-                'PS09.Algun_Air_On':
-                    firstItem['PS09.Algun_Air_On'].toLowerCase() == 'true',
-                'PS09.Num_Air_On': int.parse(firstItem['PS09.Num_Air_On']),
-                'PS09.Alarm_Adver': int.parse(firstItem['PS09.Alarm_Adver']),
-                'PS11.Algun_Air_On':
-                    firstItem['PS11.Algun_Air_On'].toLowerCase() == 'true',
-                'PS11.Num_Air_On': int.parse(firstItem['PS11.Num_Air_On']),
-                'PS11.Alarm_Adver': int.parse(firstItem['PS11.Alarm_Adver']),
-                'PS13.Algun_Air_On':
-                    firstItem['PS13.Algun_Air_On'].toLowerCase() == 'true',
-                'PS13.Num_Air_On': int.parse(firstItem['PS13.Num_Air_On']),
-                'PS13.Alarm_Adver': int.parse(firstItem['PS13.Alarm_Adver']),
-                'PS14.Algun_Air_On':
-                    firstItem['PS14.Algun_Air_On'].toLowerCase() == 'true',
-                'PS14.Num_Air_On': int.parse(firstItem['PS14.Num_Air_On']),
-                'PS14.Alarm_Adver': int.parse(firstItem['PS14.Alarm_Adver']),
-                'PS15.Algun_Air_On':
-                    firstItem['PS15.Algun_Air_On'].toLowerCase() == 'true',
-                'PS15.Num_Air_On': int.parse(firstItem['PS15.Num_Air_On']),
-                'PS15.Alarm_Adver': int.parse(firstItem['PS15.Alarm_Adver']),
-                'PS16.Algun_Air_On':
-                    firstItem['PS16.Algun_Air_On'].toLowerCase() == 'true',
-                'PS16.Num_Air_On': int.parse(firstItem['PS16.Num_Air_On']),
-                'PS16.Alarm_Adver': int.parse(firstItem['PS16.Alarm_Adver']),
-                'PS17.Algun_Air_On':
-                    firstItem['PS17.Algun_Air_On'].toLowerCase() == 'true',
-                'PS17.Num_Air_On': int.parse(firstItem['PS17.Num_Air_On']),
-                'PS17.Alarm_Adver': int.parse(firstItem['PS17.Alarm_Adver']),
-                'PS18.Algun_Air_On':
-                    firstItem['PS18.Algun_Air_On'].toLowerCase() == 'true',
-                'PS18.Num_Air_On': int.parse(firstItem['PS18.Num_Air_On']),
-                'PS18.Alarm_Adver': int.parse(firstItem['PS18.Alarm_Adver']),
-                'PS19.Algun_Air_On':
-                    firstItem['PS19.Algun_Air_On'].toLowerCase() == 'true',
-                'PS19.Num_Air_On': int.parse(firstItem['PS19.Num_Air_On']),
-                'PS19.Alarm_Adver': int.parse(firstItem['PS19.Alarm_Adver']),
-                'PS21.Algun_Air_On':
-                    firstItem['PS21.Algun_Air_On'].toLowerCase() == 'true',
-                'PS21.Num_Air_On': int.parse(firstItem['PS21.Num_Air_On']),
-                'PS21.Alarm_Adver': int.parse(firstItem['PS21.Alarm_Adver']),
-                'PS22.Algun_Air_On':
-                    firstItem['PS22.Algun_Air_On'].toLowerCase() == 'true',
-                'PS22.Num_Air_On': int.parse(firstItem['PS22.Num_Air_On']),
-                'PS22.Alarm_Adver': int.parse(firstItem['PS22.Alarm_Adver']),
-                'PS23.Algun_Air_On':
-                    firstItem['PS23.Algun_Air_On'].toLowerCase() == 'true',
-                'PS23.Num_Air_On': int.parse(firstItem['PS23.Num_Air_On']),
-                'PS23.Alarm_Adver': int.parse(firstItem['PS23.Alarm_Adver']),
-                'PS25.Algun_Air_On':
-                    firstItem['PS25.Algun_Air_On'].toLowerCase() == 'true',
-                'PS25.Num_Air_On': int.parse(firstItem['PS25.Num_Air_On']),
-                'PS25.Alarm_Adver': int.parse(firstItem['PS25.Alarm_Adver']),
-                'PS26.Algun_Air_On':
-                    firstItem['PS26.Algun_Air_On'].toLowerCase() == 'true',
-                'PS26.Num_Air_On': int.parse(firstItem['PS26.Num_Air_On']),
-                'PS26.Alarm_Adver': int.parse(firstItem['PS26.Alarm_Adver']),
-                'PS28.Algun_Air_On':
-                    firstItem['PS28.Algun_Air_On'].toLowerCase() == 'true',
-                'PS28.Num_Air_On': int.parse(firstItem['PS28.Num_Air_On']),
-                'PS28.Alarm_Adver': int.parse(firstItem['PS28.Alarm_Adver']),
-                'PS29.Algun_Air_On':
-                    firstItem['PS29.Algun_Air_On'].toLowerCase() == 'true',
-                'PS29.Num_Air_On': int.parse(firstItem['PS29.Num_Air_On']),
-                'PS29.Alarm_Adver': int.parse(firstItem['PS29.Alarm_Adver']),
-                'PS31.Algun_Air_On':
-                    firstItem['PS31.Algun_Air_On'].toLowerCase() == 'true',
-                'PS31.Num_Air_On': int.parse(firstItem['PS31.Num_Air_On']),
-                'PS31.Alarm_Adver': int.parse(firstItem['PS31.Alarm_Adver']),
-                'PS32.Algun_Air_On':
-                    firstItem['PS32.Algun_Air_On'].toLowerCase() == 'true',
-                'PS32.Num_Air_On': int.parse(firstItem['PS32.Num_Air_On']),
-                'PS32.Alarm_Adver': int.parse(firstItem['PS32.Alarm_Adver']),
-                'PS35.Algun_Air_On':
-                    firstItem['PS35.Algun_Air_On'].toLowerCase() == 'true',
-                'PS35.Num_Air_On': int.parse(firstItem['PS35.Num_Air_On']),
-                'PS35.Alarm_Adver': int.parse(firstItem['PS35.Alarm_Adver']),
-                'PS36.Algun_Air_On':
-                    firstItem['PS36.Algun_Air_On'].toLowerCase() == 'true',
-                'PS36.Num_Air_On': int.parse(firstItem['PS36.Num_Air_On']),
-                'PS36.Alarm_Adver': int.parse(firstItem['PS36.Alarm_Adver']),
-                'PS37.Algun_Air_On':
-                    firstItem['PS37.Algun_Air_On'].toLowerCase() == 'true',
-                'PS37.Num_Air_On': int.parse(firstItem['PS37.Num_Air_On']),
-                'PS37.Alarm_Adver': int.parse(firstItem['PS37.Alarm_Adver']),
-                'PS38.Algun_Air_On':
-                    firstItem['PS38.Algun_Air_On'].toLowerCase() == 'true',
-                'PS38.Num_Air_On': int.parse(firstItem['PS38.Num_Air_On']),
-                'PS38.Alarm_Adver': int.parse(firstItem['PS38.Alarm_Adver']),
-                'PS39.Algun_Air_On':
-                    firstItem['PS39.Algun_Air_On'].toLowerCase() == 'true',
-                'PS39.Num_Air_On': int.parse(firstItem['PS39.Num_Air_On']),
-                'PS39.Alarm_Adver': int.parse(firstItem['PS39.Alarm_Adver']),
-                'UDT_DATA_GLOB_Hora_Ini_1_GLOB':
-                    firstItem['UDT_DATA_GLOB_Hora_Ini_1_GLOB']?.split('.')[0] ??
-                        '00:00:00',
-                'UDT_DATA_GLOB_Hora_Fin_2_GLOB':
-                    firstItem['UDT_DATA_GLOB_Hora_Fin_2_GLOB']?.split('.')[0] ??
-                        '00:00:00',
-              });
-
-              // Contar cuántas piscinas tienen estado false
-              int piscinasOnCount = 0;
-              firstItem.forEach((key, value) {
-                if (key.endsWith('Num_Air_On') && int.parse(value) > 0) {
-                  piscinasOnCount++;
+              try {
+                // Procesar datos para apiDataList
+                Map<String, dynamic> piscinasData = {};
+                // Verificar y mapear todos los campos necesarios
+                for (String piscina in _piscinasCamposRequeridos) {
+                  if (!_verificarCamposPiscina(firstItem, piscina)) {
+                    return; // Si faltan campos para alguna piscina, no continuar
+                  }
+                  piscinasData['$piscina.Algun_Air_On'] =
+                      firstItem['$piscina.Algun_Air_On'].toLowerCase() ==
+                          'true';
+                  piscinasData['$piscina.Num_Air_On'] =
+                      int.parse(firstItem['$piscina.Num_Air_On']);
+                  piscinasData['$piscina.Alarm_Adver'] =
+                      int.parse(firstItem['$piscina.Alarm_Adver']);
                 }
-              });
 
-              // Crear y agregar el objeto a apiDataListOffAntenas
-              apiDataListOnPs.add({
-                'PiscinasOn': piscinasOnCount.toString(),
-              });
-
-              // Antenas //
-
-              apiDataListAntenas.add({
-                'Pot_TA03-1': int.parse(itemAntenas['Pot_TA03-1']),
-                'Pot_TA01-1': int.parse(itemAntenas['Pot_TA01-1']),
-                'Pot_TA01-2': int.parse(itemAntenas['Pot_TA01-2']),
-                'Pot_TA117-1': int.parse(itemAntenas['Pot_TA117-1']),
-                'Pot_TA02-1': int.parse(itemAntenas['Pot_TA02-1']),
-                'Pot_TA10-1': int.parse(itemAntenas['Pot_TA10-1']),
-                'Pot_TA02-2': int.parse(itemAntenas['Pot_TA02-2']),
-                'Pot_TA103-1': int.parse(itemAntenas['Pot_TA103-1']),
-                'Pot_TA104-1': int.parse(itemAntenas['Pot_TA104-1']),
-                'Pot_TA04-1': int.parse(itemAntenas['Pot_TA04-1']),
-                'Pot_TA16-1': int.parse(itemAntenas['Pot_TA16-1']),
-                'Pot_TA05-1': int.parse(itemAntenas['Pot_TA05-1']),
-                'Pot_TA106-1': int.parse(itemAntenas['Pot_TA106-1']),
-                'Pot_TA05-2': int.parse(itemAntenas['Pot_TA05-2']),
-                'Pot_TA11-1': int.parse(itemAntenas['Pot_TA11-1']),
-                'Pot_TA06-1': int.parse(itemAntenas['Pot_TA06-1']),
-                'Pot_TA102-1': int.parse(itemAntenas['Pot_TA102-1']),
-                'Pot_TA07-1': int.parse(itemAntenas['Pot_TA07-1']),
-                'Pot_TA08-1': int.parse(itemAntenas['Pot_TA08-1']),
-                'Pot_TA111-1': int.parse(itemAntenas['Pot_TA111-1']),
-                'Pot_TA09-1': int.parse(itemAntenas['Pot_TA09-1']),
-                'Pot_TA42-2': int.parse(itemAntenas['Pot_TA42-2']),
-                'Pot_TA115-1': int.parse(itemAntenas['Pot_TA115-1']),
-                'Pot_TA101-1': int.parse(itemAntenas['Pot_TA101-1']),
-                'Pot_TA107-1': int.parse(itemAntenas['Pot_TA107-1']),
-                'Pot_TA108-1': int.parse(itemAntenas['Pot_TA108-1']),
-                'Pot_TA113-1': int.parse(itemAntenas['Pot_TA113-1']),
-                'Pot_TA114-1': int.parse(itemAntenas['Pot_TA114-1']),
-                'Pot_TA116-1': int.parse(itemAntenas['Pot_TA116-1']),
-                'Pot_TA13-1': int.parse(itemAntenas['Pot_TA13-1']),
-                'Pot_TA14-1': int.parse(itemAntenas['Pot_TA14-1']),
-                'Pot_TA15-1': int.parse(itemAntenas['Pot_TA15-1']),
-                'Pot_TA17-1': int.parse(itemAntenas['Pot_TA17-1']),
-                'Pot_TA18-1': int.parse(itemAntenas['Pot_TA18-1']),
-                'Pot_TA19-1': int.parse(itemAntenas['Pot_TA19-1']),
-                'Pot_TA20-1': int.parse(itemAntenas['Pot_TA20-1']),
-                'Pot_TA21-1': int.parse(itemAntenas['Pot_TA21-1']),
-                'Pot_TA22-1': int.parse(itemAntenas['Pot_TA22-1']),
-                'Pot_TA23-1': int.parse(itemAntenas['Pot_TA23-1']),
-                'Pot_TA23-2': int.parse(itemAntenas['Pot_TA23-2']),
-                'Pot_TA24-1': int.parse(itemAntenas['Pot_TA24-1']),
-                'Pot_TA24-2': int.parse(itemAntenas['Pot_TA24-2']),
-                'Pot_TA25-1': int.parse(itemAntenas['Pot_TA25-1']),
-                'Pot_TA26-1': int.parse(itemAntenas['Pot_TA26-1']),
-                'Pot_TA27-1': int.parse(itemAntenas['Pot_TA27-1']),
-                'Pot_TA27-2': int.parse(itemAntenas['Pot_TA27-2']),
-                'Pot_TA28-1': int.parse(itemAntenas['Pot_TA28-1']),
-                'Pot_TA29-1': int.parse(itemAntenas['Pot_TA29-1']),
-                'Pot_TA30-1': int.parse(itemAntenas['Pot_TA30-1']),
-                'Pot_TA30-2': int.parse(itemAntenas['Pot_TA30-2']),
-                'Pot_TA31-1': int.parse(itemAntenas['Pot_TA31-1']),
-                'Pot_TA32-1': int.parse(itemAntenas['Pot_TA32-1']),
-                'Pot_TA33-1': int.parse(itemAntenas['Pot_TA33-1']),
-                'Pot_TA34-1': int.parse(itemAntenas['Pot_TA34-1']),
-                'Pot_TA35-1': int.parse(itemAntenas['Pot_TA35-1']),
-                'Pot_TA36-1': int.parse(itemAntenas['Pot_TA36-1']),
-                'Pot_TA37-1': int.parse(itemAntenas['Pot_TA37-1']),
-                'Pot_TA38-1': int.parse(itemAntenas['Pot_TA38-1']),
-                'Pot_TA38-2': int.parse(itemAntenas['Pot_TA38-2']),
-                'Pot_TA39-1': int.parse(itemAntenas['Pot_TA39-1']),
-                'Pot_TA39-2': int.parse(itemAntenas['Pot_TA39-2']),
-                'Pot_TA40-1': int.parse(itemAntenas['Pot_TA40-1']),
-                'Pot_TA40-2': int.parse(itemAntenas['Pot_TA40-2']),
-                'Pot_TA41-1': int.parse(itemAntenas['Pot_TA41-1']),
-                'Pot_TA41-2': int.parse(itemAntenas['Pot_TA41-2']),
-                'Pot_TA42-1': int.parse(itemAntenas['Pot_TA42-1']),
-                'Pot_TA43-1': int.parse(itemAntenas['Pot_TA43-1']),
-                'Pot_TA43-2': int.parse(itemAntenas['Pot_TA43-2']),
-                'Pot_TA44-1': int.parse(itemAntenas['Pot_TA44-1']),
-                'Pot_TA45-1': int.parse(itemAntenas['Pot_TA45-1']),
-                'Pot_TA46-1': int.parse(itemAntenas['Pot_TA46-1']),
-                'Pot_TA47-1': int.parse(itemAntenas['Pot_TA47-1']),
-                'Pot_TA47B-1': int.parse(itemAntenas['Pot_TA47B-1']),
-                'Pot_TA48-1': int.parse(itemAntenas['Pot_TA48-1']),
-                'Pot_TA49-1': int.parse(itemAntenas['Pot_TA49-1']),
-                'Pot_TA50-1': int.parse(itemAntenas['Pot_TA50-1']),
-                'Pot_TA51-1': int.parse(itemAntenas['Pot_TA51-1']),
-                'Pot_TA52-1': int.parse(itemAntenas['Pot_TA52-1']),
-                'Pot_TA53-1': int.parse(itemAntenas['Pot_TA53-1']),
-                'Pot_TA54-1': int.parse(itemAntenas['Pot_TA54-1']),
-                'Pot_TA55-1': int.parse(itemAntenas['Pot_TA55-1']),
-                'Pot_TA56-1': int.parse(itemAntenas['Pot_TA56-1']),
-                'Pot_TA57-1': int.parse(itemAntenas['Pot_TA57-1']),
-                'Pot_TA58-1': int.parse(itemAntenas['Pot_TA58-1']),
-                'Pot_AP1-B': int.parse(itemAntenas['Pot_AP1-B']),
-                'Pot_AP1': int.parse(itemAntenas['Pot-AP1']),
-                'Pot_AP2': int.parse(itemAntenas['Pot-AP2']),
-                'Pot_AP3': int.parse(itemAntenas['Pot-AP3']),
-                'Pot_Camp-PTP-Mari':
-                    int.parse(itemAntenas['Pot_Camp-PTP-Mari']),
-                'Pot_EB_G1': int.parse(itemAntenas['Pot_EB_G1']),
-                // 'Pot_EB_G2': int.parse(itemAntenas['Pot_EB_G2']),
-                'Pot_PTP-Camp-T1': int.parse(itemAntenas['Pot_PTP-Camp-T1']),
-                'Pot_PTP-Camp-T2': int.parse(itemAntenas['Pot_PTP-Camp-T2']),
-                'Pot_PTP-Camp-T3': int.parse(itemAntenas['Pot_PTP-Camp-T3']),
-                'Pot_PTP-Mari': int.parse(itemAntenas['Pot_PTP-Mari']),
-                'Pot_PTP-T1': int.parse(itemAntenas['Pot_PTP-T1']),
-                'Pot_PTP-T2': int.parse(itemAntenas['Pot_PTP-T2']),
-                'Pot_PTP-T3': int.parse(itemAntenas['Pot_PTP-T3']),
-                'Stat_TA13-1': itemAntenas['Stat_TA13-1'] == "TRUE",
-                'Stat_TA39-2': itemAntenas['Stat_TA39-2'] == "TRUE",
-                'Stat_TA114-1': itemAntenas['Stat_TA114-1'] == "TRUE",
-                'Stat_TA37-1': itemAntenas['Stat_TA37-1'] == "TRUE",
-                'Stat_TA01-1': itemAntenas['Stat_TA01-1'] == "TRUE",
-                'Stat_TA49-1': itemAntenas['Stat_TA49-1'] == "TRUE",
-                'Stat_TA01-2': itemAntenas['Stat_TA01-2'] == "TRUE",
-                'Stat_TA15-1': itemAntenas['Stat_TA15-1'] == "TRUE",
-                'Stat_TA40-2': itemAntenas['Stat_TA40-2'] == "TRUE",
-                'Stat_TA115-1': itemAntenas['Stat_TA115-1'] == "TRUE",
-                'Stat_TA02-1': itemAntenas['Stat_TA02-1'] == "TRUE",
-                'Stat_TA02-2': itemAntenas['Stat_TA02-2'] == "TRUE",
-                'Stat_TA03-1': itemAntenas['Stat_TA03-1'] == "TRUE",
-                'Stat_TA101-1': itemAntenas['Stat_TA101-1'] == "TRUE",
-                'Stat_TA104-1': itemAntenas['Stat_TA104-1'] == "TRUE",
-                'Stat_TA07-1': itemAntenas['Stat_TA07-1'] == "TRUE",
-
-                'Stat_TA29-1': itemAntenas['Stat_TA29-1'] == "TRUE",
-                'Stat_TA04-1': itemAntenas['Stat_TA04-1'] == "TRUE",
-                'Stat_TA42-2': itemAntenas['Stat_TA42-2'] == "TRUE",
-                'Stat_TA14-1': itemAntenas['Stat_TA14-1'] == "TRUE",
-                'Stat_TA05-1': itemAntenas['Stat_TA05-1'] == "TRUE",
-                'Stat_TA05-2': itemAntenas['Stat_TA05-2'] == "TRUE",
-                'Stat_TA17-1': itemAntenas['Stat_TA17-1'] == "TRUE",
-                'Stat_PTP-Camp-T3': itemAntenas['Stat_PTP-Camp-T3'] == "TRUE",
-                'Stat_TA06-1': itemAntenas['Stat_TA06-1'] == "TRUE",
-                'Stat_TA107-1': itemAntenas['Stat_TA107-1'] == "TRUE",
-                'Stat_TA32-1': itemAntenas['Stat_TA32-1'] == "TRUE",
-                'Stat_TA45-1': itemAntenas['Stat_TA45-1'] == "TRUE",
-                'Stat_TA08-1': itemAntenas['Stat_TA08-1'] == "TRUE",
-                'Stat_TA18-1': itemAntenas['Stat_TA18-1'] == "TRUE",
-                'Stat_TA09-1': itemAntenas['Stat_TA09-1'] == "TRUE",
-                'Stat_TA10-1': itemAntenas['Stat_TA10-1'] == "TRUE",
-                'Stat_TA102-1': itemAntenas['Stat_TA102-1'] == "TRUE",
-                'Stat_TA103-1': itemAntenas['Stat_TA103-1'] == "TRUE",
-                'Stat_TA106-1': itemAntenas['Stat_TA106-1'] == "TRUE",
-                'Stat_TA108-1': itemAntenas['Stat_TA108-1'] == "TRUE",
-                'Stat_TA11-1': itemAntenas['Stat_TA11-1'] == "TRUE",
-                'Stat_TA111-1': itemAntenas['Stat_TA111-1'] == "TRUE",
-                'Stat_TA113-1': itemAntenas['Stat_TA113-1'] == "TRUE",
-                'Stat_TA116-1': itemAntenas['Stat_TA116-1'] == "TRUE",
-                'Stat_TA117-1': itemAntenas['Stat_TA117-1'] == "TRUE",
-                'Stat_TA16-1': itemAntenas['Stat_TA16-1'] == "TRUE",
-                'Stat_TA19-1': itemAntenas['Stat_TA19-1'] == "TRUE",
-                'Stat_TA20-1': itemAntenas['Stat_TA20-1'] == "TRUE",
-                'Stat_TA21-1': itemAntenas['Stat_TA21-1'] == "TRUE",
-                'Stat_TA22-1': itemAntenas['Stat_TA22-1'] == "TRUE",
-                'Stat_TA23-1': itemAntenas['Stat_TA23-1'] == "TRUE",
-                'Stat_TA23-2': itemAntenas['Stat_TA23-2'] == "TRUE",
-                'Stat_TA24-1': itemAntenas['Stat_TA24-1'] == "TRUE",
-                'Stat_TA24-2': itemAntenas['Stat_TA24-2'] == "TRUE",
-                'Stat_TA25-1': itemAntenas['Stat_TA25-1'] == "TRUE",
-                'Stat_TA26-1': itemAntenas['Stat_TA26-1'] == "TRUE",
-                'Stat_TA27-1': itemAntenas['Stat_TA27-1'] == "TRUE",
-                'Stat_TA27-2': itemAntenas['Stat_TA27-2'] == "TRUE",
-                'Stat_TA28-1': itemAntenas['Stat_TA28-1'] == "TRUE",
-                'Stat_TA30-1': itemAntenas['Stat_TA30-1'] == "TRUE",
-                'Stat_TA30-2': itemAntenas['Stat_TA30-2'] == "TRUE",
-                'Stat_TA31-1': itemAntenas['Stat_TA31-1'] == "TRUE",
-                'Stat_TA33-1': itemAntenas['Stat_TA33-1'] == "TRUE",
-                'Stat_TA34-1': itemAntenas['Stat_TA34-1'] == "TRUE",
-                'Stat_TA35-1': itemAntenas['Stat_TA35-1'] == "TRUE",
-                'Stat_TA36-1': itemAntenas['Stat_TA36-1'] == "TRUE",
-                'Stat_TA38-1': itemAntenas['Stat_TA38-1'] == "TRUE",
-                'Stat_TA38-2': itemAntenas['Stat_TA38-2'] == "TRUE",
-                'Stat_TA39-1': itemAntenas['Stat_TA39-1'] == "TRUE",
-                'Stat_TA40-1': itemAntenas['Stat_TA40-1'] == "TRUE",
-                'Stat_TA41-1': itemAntenas['Stat_TA41-1'] == "TRUE",
-                'Stat_TA41-2': itemAntenas['Stat_TA41-2'] == "TRUE",
-                'Stat_TA42-1': itemAntenas['Stat_TA42-1'] == "TRUE",
-                'Stat_TA43-1': itemAntenas['Stat_TA43-1'] == "TRUE",
-                'Stat_TA43-2': itemAntenas['Stat_TA43-2'] == "TRUE",
-                'Stat_TA44-1': itemAntenas['Stat_TA44-1'] == "TRUE",
-                'Stat_TA46-1': itemAntenas['Stat_TA46-1'] == "TRUE",
-                'Stat_TA47-1': itemAntenas['Stat_TA47-1'] == "TRUE",
-                'Stat_TA47B-1': itemAntenas['Stat_TA47B-1'] == "TRUE",
-                'Stat_TA48-1': itemAntenas['Stat_TA48-1'] == "TRUE",
-                'Stat_TA50-1': itemAntenas['Stat_TA50-1'] == "TRUE",
-                'Stat_TA51-1': itemAntenas['Stat_TA51-1'] == "TRUE",
-                'Stat_TA52-1': itemAntenas['Stat_TA52-1'] == "TRUE",
-                'Stat_TA53-1': itemAntenas['Stat_TA53-1'] == "TRUE",
-                'Stat_TA54-1': itemAntenas['Stat_TA54-1'] == "TRUE",
-                'Stat_TA55-1': itemAntenas['Stat_TA55-1'] == "TRUE",
-                'Stat_TA56-1': itemAntenas['Stat_TA56-1'] == "TRUE",
-                'Stat_TA57-1': itemAntenas['Stat_TA57-1'] == "TRUE",
-                'Stat_TA58-1': itemAntenas['Stat_TA58-1'] == "TRUE",
-                'Stat_AP1': itemAntenas['Stat_AP1'] == "TRUE",
-                'Stat_AP1-B': itemAntenas['Stat_AP1-B'] == "TRUE",
-                'Stat_AP2': itemAntenas['Stat_AP2'] == "TRUE",
-                'Stat_AP3': itemAntenas['Stat_AP3'] == "TRUE",
-                'Stat_Camp-PTP-Mari':
-                    itemAntenas['Stat_Camp-PTP-Mari'] == "TRUE",
-                'Stat_PTP-T1': itemAntenas['Stat_PTP-T1'] == "TRUE",
-                'Stat_PTP-T2': itemAntenas['Stat_PTP-T2'] == "TRUE",
-                'Stat_PTP-T3': itemAntenas['Stat_PTP-T3'] == "TRUE",
-                'Stat_EB_G1': itemAntenas['Stat_EB_G1'] == "TRUE",
-                'Stat_EB_G2': itemAntenas['Stat_EB_G2'] == "TRUE",
-                'Stat_PTP-Camp-T1': itemAntenas['Stat_PTP-Camp-T1'] == "TRUE",
-                'Stat_PTP-Camp-T2': itemAntenas['Stat_PTP-Camp-T2'] == "TRUE",
-              });
-
-              // Contar cuántas piscinas tienen estado false
-              int antenasOffCount = 0;
-              itemAntenas.forEach((key, value) {
-                // print(value);
-                if (key.startsWith('Stat') && value == 'FALSE') {
-                  antenasOffCount++;
+                // Añadir campos horarios con verificación
+                if (firstItem.containsKey('UDT_DATA_GLOB_Hora_Ini_1_GLOB')) {
+                  piscinasData['UDT_DATA_GLOB_Hora_Ini_1_GLOB'] =
+                      firstItem['UDT_DATA_GLOB_Hora_Ini_1_GLOB']
+                              ?.split('.')[0] ??
+                          '00:00:00';
+                } else {
+                  piscinasData['UDT_DATA_GLOB_Hora_Ini_1_GLOB'] = '00:00:00';
                 }
-              });
 
-              // Crear y agregar el objeto a apiDataListOffAntenas
-              apiDataListOffAntenas.add({
-                'AntenasOff': antenasOffCount.toString(),
-              });
+                if (firstItem.containsKey('UDT_DATA_GLOB_Hora_Fin_2_GLOB')) {
+                  piscinasData['UDT_DATA_GLOB_Hora_Fin_2_GLOB'] =
+                      firstItem['UDT_DATA_GLOB_Hora_Fin_2_GLOB']
+                              ?.split('.')[0] ??
+                          '00:00:00';
+                } else {
+                  piscinasData['UDT_DATA_GLOB_Hora_Fin_2_GLOB'] = '00:00:00';
+                }
 
-              _apiDataListInfoGeneralPis.addAll([
-                apiDataList,
-                apiDataListOnPs,
-                apiDataListAntenas,
-                apiDataListOffAntenas
-              ]);
+                apiDataList.add(piscinasData);
 
-              // print(_apiDataListInfoGeneralPis[1][0]);
+                // Contar piscinas activas con verificación
+                int piscinasOnCount = 0;
+                firstItem.forEach((key, value) {
+                  if (key.endsWith('Num_Air_On') && value != null) {
+                    try {
+                      if (int.parse(value) > 0) {
+                        piscinasOnCount++;
+                      }
+                    } catch (e) {
+                      // Ignorar errores de parseo
+                    }
+                  }
+                });
 
-              isLoading2 = false; // Finalizar el estado de cargando
-              notifyListeners();
-              // print(isLoading2);
-              // print(_apiDataListPS01)
+                apiDataListOnPs.add({
+                  'PiscinasOn': piscinasOnCount.toString(),
+                });
+
+                // Validar y procesar datos de antenas
+                if (!_verificarCamposAntenas(itemAntenas)) {
+                  return; // Si faltan campos de antenas, no continuar
+                }
+
+                // Procesar datos de antenas con verificación
+                Map<String, dynamic> antenasData = {};
+                for (String antena in _antenasCamposRequeridos) {
+                  if (itemAntenas.containsKey('Pot_$antena')) {
+                    antenasData['Pot_$antena'] =
+                        _parseIntSafe(itemAntenas['Pot_$antena']);
+                  }
+                  if (itemAntenas.containsKey('Stat_$antena')) {
+                    antenasData['Stat_$antena'] =
+                        itemAntenas['Stat_$antena'] == "TRUE";
+                  }
+                }
+
+                apiDataListAntenas.add(antenasData);
+
+                // Contar antenas inactivas
+                int antenasOffCount = 0;
+                itemAntenas.forEach((key, value) {
+                  if (key.startsWith('Stat') && value == 'FALSE') {
+                    antenasOffCount++;
+                  }
+                });
+
+                apiDataListOffAntenas.add({
+                  'AntenasOff': antenasOffCount.toString(),
+                });
+
+                // Modificación a realizar dentro del bloque if donde actualizas _apiDataListInfoGeneralPis
+                if (apiDataList.isNotEmpty &&
+                    apiDataListOnPs.isNotEmpty &&
+                    apiDataListAntenas.isNotEmpty &&
+                    apiDataListOffAntenas.isNotEmpty) {
+                  // Verificar que cada mapa dentro de cada lista tenga datos correctos
+                  bool datosCompletos = _verificarDatosCompletos(
+                      apiDataList,
+                      apiDataListOnPs,
+                      apiDataListAntenas,
+                      apiDataListOffAntenas);
+
+                  if (datosCompletos) {
+                    _apiDataListInfoGeneralPis.clear();
+                    _apiDataListInfoGeneralPis.addAll([
+                      apiDataList,
+                      apiDataListOnPs,
+                      apiDataListAntenas,
+                      apiDataListOffAntenas
+                    ]);
+
+                    isLoading2 = false;
+                    notifyListeners();
+                  } else {
+                    // Si los datos no están completos, mantener el estado de carga
+                    isLoading2 = true;
+                    print(
+                        "Datos incompletos detectados - no se actualizó el estado");
+                  }
+                }
+              } catch (e) {
+                print('Error procesando datos: $e');
+                // No actualizar los datos cuando hay errores
+              }
             }
           }, onError: (error) {
-            isLoading2 = false; // Finalizar el estado de cargando
-            _hasError = true; // Activar el estado de error
-            // _errorMessage = error.toString(); // Almacenar mensaje de error
-            // print('aaerrrrorrrrr');
+            isLoading2 = false;
+            _hasError = true;
             notifyListeners();
           });
-        } else {}
+        }
       } catch (e) {
-        // print('aaerrrrorrrrr');
+        print('Error en suscripción: $e');
       }
     }
+  }
+
+// Lista de campos requeridos para las piscinas
+  final List<String> _piscinasCamposRequeridos = [
+    'PS06', 'PC103', 'PC104', 'PC107', 'PS30', 'PS04', 'PC101', 'PS27', 'PS40',
+    'PS41', 'PS42', 'PS43', 'PS44', 'PS45', 'PS46', 'PS47', 'PS47B', 'PS48',
+    'PS49',
+    'PS50', 'PS51', 'PS52', 'PS53', 'PS54', 'PS55', 'PS56', 'PS57', 'PS58',
+    'PS05',
+    'PC102', 'PC20', 'PC106', 'PC108', 'PC111', 'PC113', 'PC114', 'PC115',
+    'PC116', 'PC117',
+    'PS08', 'PS34', 'PS24', 'PS10', 'PS33', 'PS01', 'PS02', 'PS03', 'PS07',
+    'PS09',
+    'PS11', 'PS13', 'PS14', 'PS15', 'PS16', 'PS17', 'PS18', 'PS19', 'PS21',
+    'PS22',
+    'PS23', 'PS25', 'PS26', 'PS28', 'PS29', 'PS31', 'PS32', 'PS35', 'PS36',
+    'PS37',
+    'PS38', 'PS39'
+    // Añade todas las piscinas necesarias aquí
+  ];
+
+// Lista de campos requeridos para las antenas
+  final List<String> _antenasCamposRequeridos = [
+    'TA03-1', 'TA01-1', 'TA01-2', 'TA117-1', 'TA02-1', 'TA10-1', 'TA02-2',
+    'TA103-1', 'TA104-1', 'TA04-1', 'TA16-1', 'TA05-1', 'TA106-1', 'TA05-2',
+    'TA11-1', 'TA06-1', 'TA102-1', 'TA07-1', 'TA08-1', 'TA111-1', 'TA09-1',
+    'TA42-2', 'TA115-1', 'TA101-1', 'TA107-1', 'TA108-1', 'TA113-1', 'TA114-1',
+    'TA116-1', 'TA13-1', 'TA14-1', 'TA15-1', 'TA17-1', 'TA18-1', 'TA19-1',
+    'TA20-1', 'TA21-1', 'TA22-1', 'TA23-1', 'TA23-2', 'TA24-1', 'TA24-2',
+    'TA25-1', 'TA26-1', 'TA27-1', 'TA27-2', 'TA28-1', 'TA29-1', 'TA30-1',
+    'TA30-2', 'TA31-1', 'TA32-1', 'TA33-1', 'TA34-1', 'TA35-1', 'TA36-1',
+    'TA37-1', 'TA38-1', 'TA38-2', 'TA39-1', 'TA39-2', 'TA40-1', 'TA40-2',
+    'TA41-1', 'TA41-2', 'TA42-1', 'TA43-1', 'TA43-2', 'TA44-1', 'TA45-1',
+    'TA46-1', 'TA47-1', 'TA47B-1', 'TA48-1', 'TA49-1', 'TA50-1', 'TA51-1',
+    'TA52-1', 'TA53-1', 'TA54-1', 'TA55-1', 'TA56-1', 'TA57-1', 'TA58-1',
+    'AP1-B', 'AP1', 'AP2', 'AP3', 'Camp-PTP-Mari', 'EB_G1', 'PTP-Camp-T1',
+    'PTP-Camp-T2', 'PTP-Camp-T3', 'PTP-Mari', 'PTP-T1', 'PTP-T2', 'PTP-T3'
+    // Añade todas las antenas necesarias aquí
+  ];
+
+// Verificar si todos los campos requeridos están presentes para una piscina
+  bool _verificarCamposPiscina(dynamic item, String piscina) {
+    return item != null &&
+        item.containsKey('$piscina.Algun_Air_On') &&
+        item.containsKey('$piscina.Num_Air_On') &&
+        item.containsKey('$piscina.Alarm_Adver');
+  }
+
+// Verificar si los campos requeridos para antenas están presentes
+  bool _verificarCamposAntenas(dynamic itemAntenas) {
+    if (itemAntenas == null) return false;
+
+    // Verificar al menos algunos campos esenciales
+    bool tieneAlgunosPot = false;
+    bool tieneAlgunosStat = false;
+
+    for (String antena in _antenasCamposRequeridos) {
+      if (itemAntenas.containsKey('Pot_$antena')) tieneAlgunosPot = true;
+      if (itemAntenas.containsKey('Stat_$antena')) tieneAlgunosStat = true;
+      if (tieneAlgunosPot && tieneAlgunosStat) return true;
+    }
+
+    return false;
+  }
+
+// Verificar si el evento tiene todos los datos necesarios
+  bool _datosCompletos(Map<String, dynamic> evento) {
+    if (!evento.containsKey('InfoGeneralPS') ||
+        !evento.containsKey('Antenas') ||
+        evento['InfoGeneralPS'] == null ||
+        evento['InfoGeneralPS'].isEmpty ||
+        evento['Antenas'] == null ||
+        evento['Antenas'].isEmpty) {
+      return false;
+    }
+    return true;
+  }
+
+// Parseo seguro de int
+  int _parseIntSafe(dynamic valor) {
+    if (valor == null) return 0;
+    try {
+      return int.parse(valor.toString());
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  // Añadir este método a tu clase PiscinasJosefinaProvider
+  bool _verificarDatosCompletos(
+      List<Map<dynamic, dynamic>> apiDataList,
+      List<Map<dynamic, dynamic>> apiDataListOnPs,
+      List<Map<dynamic, dynamic>> apiDataListAntenas,
+      List<Map<dynamic, dynamic>> apiDataListOffAntenas) {
+    // 1. Verificar datos de piscinas
+    if (apiDataList.isEmpty || apiDataList[0].isEmpty) return false;
+
+    // Verificar que los campos clave existan en apiDataList
+    Map<dynamic, dynamic> piscinasData = apiDataList[0];
+    for (String piscina in _piscinasCamposRequeridos) {
+      if (!piscinasData.containsKey('$piscina.Algun_Air_On') ||
+          !piscinasData.containsKey('$piscina.Num_Air_On') ||
+          !piscinasData.containsKey('$piscina.Alarm_Adver')) {
+        print("Faltan campos requeridos para $piscina");
+        return false;
+      }
+    }
+
+    // 2. Verificar datos del conteo de piscinas
+    if (apiDataListOnPs.isEmpty || apiDataListOnPs[0].isEmpty) return false;
+    if (!apiDataListOnPs[0].containsKey('PiscinasOn')) {
+      print("Falta el contador PiscinasOn");
+      return false;
+    }
+
+    // 3. Verificar datos de antenas
+    if (apiDataListAntenas.isEmpty || apiDataListAntenas[0].isEmpty)
+      return false;
+
+    // Verificar al menos algunos campos clave de antenas
+    Map<dynamic, dynamic> antenasData = apiDataListAntenas[0];
+    bool tienePotencias = false;
+    bool tieneEstados = false;
+
+    for (String antena in _antenasCamposRequeridos) {
+      if (antenasData.containsKey('Pot_$antena')) tienePotencias = true;
+      if (antenasData.containsKey('Stat_$antena')) tieneEstados = true;
+      if (tienePotencias && tieneEstados) break;
+    }
+
+    if (!tienePotencias || !tieneEstados) {
+      print("Faltan datos de potencia o estado de antenas");
+      return false;
+    }
+
+    // 4. Verificar contador de antenas offline
+    if (apiDataListOffAntenas.isEmpty || apiDataListOffAntenas[0].isEmpty)
+      return false;
+    if (!apiDataListOffAntenas[0].containsKey('AntenasOff')) {
+      print("Falta el contador AntenasOff");
+      return false;
+    }
+
+    // Si todas las verificaciones pasan, los datos están completos
+    return true;
   }
 
   static Future<dynamic> getPiscinasHistorialAireacionJosefina(

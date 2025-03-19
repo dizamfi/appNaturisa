@@ -382,46 +382,59 @@ class _HistorialAireacionJosefinaScreenState
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 80,
-        centerTitle: true,
         automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+        // Eliminar la propiedad title y actions, y reemplazar con flexibleSpace
+        flexibleSpace: Stack(
           children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Container(
-                color: Colors.transparent,
-                height: size.height * 0.1,
-                width: size.width * 0.083,
-                child: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: 18,
+            // Título centrado absolutamente en relación a la pantalla
+            Positioned.fill(
+              child: Center(
+                child: Text(
+                  'Historial',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
+            // Calendario posicionado absolutamente a la derecha
+            Positioned(
+              top: MediaQuery.of(context).padding.top +
+                  15, // Considera el statusbar
+              right: 15, // Margen derecho
+              child: IconButton(
+                onPressed: _selectDate,
+                icon: const Icon(
+                  Icons.calendar_today,
                   color: Colors.black,
                 ),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 50),
-              child: Text(
-                'Historial',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            IconButton(
-              onPressed: _selectDate,
-              icon: const Icon(
-                Icons.calendar_today,
-                color: Colors.black,
-              ),
-            ),
+
+            // Botón atrás si es necesario
+            // Positioned(
+            //   top: MediaQuery.of(context).padding.top + 15,
+            //   left: 8,
+            //   child: GestureDetector(
+            //     onTap: () => Navigator.pop(context),
+            //     child: Container(
+            //       color: Colors.transparent,
+            //       height: 40,
+            //       width: 40,
+            //       child: const Icon(
+            //         Icons.arrow_back_ios_new_rounded,
+            //         size: 18,
+            //         color: Colors.black,
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
+        // Eliminar la propiedad actions completamente
       ),
       body: Container(
         color: Colors.white,

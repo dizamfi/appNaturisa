@@ -8,15 +8,38 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
-class InicioCamaronerasScreen extends StatelessWidget {
+class InicioCamaronerasScreen extends StatefulWidget {
+  // Convertido a StatefulWidget
   const InicioCamaronerasScreen({super.key});
 
+  @override
+  State<InicioCamaronerasScreen> createState() =>
+      _InicioCamaronerasScreenState();
+}
+
+class _InicioCamaronerasScreenState extends State<InicioCamaronerasScreen> {
   // Lista de pantallas que cambiarán cuando se toque una opción
   static final List<Widget> _pages = <Widget>[
     CamaroneraScreen(),
     // MonitoreoScreen(),
     const ProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Sincronizar el índice local con el global al iniciar
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final navigationProvider =
+          Provider.of<NavigationProvider>(context, listen: false);
+
+      // Si el índice global se ha establecido, usarlo
+      if (NavigationProvider.globalIndex != navigationProvider.selectedIndex) {
+        navigationProvider.setSelectedIndex(NavigationProvider.globalIndex);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +54,9 @@ class InicioCamaronerasScreen extends StatelessWidget {
                 const CerrarSesionScreen(),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
-              // Usar CurvedAnimation para personalizar la curva y duración
               final fadeAnimation = CurvedAnimation(
                 parent: animation,
-                curve: Curves.easeInOut, // Puedes probar diferentes curvas
+                curve: Curves.easeInOut,
               );
 
               return FadeTransition(
@@ -42,8 +64,7 @@ class InicioCamaronerasScreen extends StatelessWidget {
                 child: child,
               );
             },
-            transitionDuration:
-                const Duration(milliseconds: 250), // Duración de la transición
+            transitionDuration: const Duration(milliseconds: 250),
           ),
         );
         return true;
@@ -51,16 +72,14 @@ class InicioCamaronerasScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.white,
         body: AnimatedSwitcher(
-          duration:
-              const Duration(milliseconds: 250), // Duración de la transición
+          duration: const Duration(milliseconds: 250),
           transitionBuilder: (Widget child, Animation<double> animation) {
             return FadeTransition(
               opacity: animation,
               child: child,
             );
           },
-          child: _pages[navigationProvider
-              .selectedIndex], // Cambia el contenido según el índice seleccionado
+          child: _pages[navigationProvider.selectedIndex],
         ),
         bottomNavigationBar: Column(
           mainAxisSize: MainAxisSize.min,
@@ -70,8 +89,6 @@ class InicioCamaronerasScreen extends StatelessWidget {
               color: Colors.grey[300],
             ),
             BottomAppBar(
-              // elevation: 5,
-              // shape: const CircularNotchedRectangle(),
               color: Colors.transparent,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -81,14 +98,22 @@ class InicioCamaronerasScreen extends StatelessWidget {
                     label: 'Inicio',
                     index: 0,
                     selectedIndex: navigationProvider.selectedIndex,
-                    onTap: navigationProvider.setSelectedIndex,
+                    onTap: (index) {
+                      // Actualizamos tanto el índice local como el global
+                      NavigationProvider.setGlobalIndex(index);
+                      navigationProvider.setSelectedIndex(index);
+                    },
                   ),
                   _buildNavItem(
                     icon: Icons.person,
                     label: 'Perfil',
                     index: 1,
                     selectedIndex: navigationProvider.selectedIndex,
-                    onTap: navigationProvider.setSelectedIndex,
+                    onTap: (index) {
+                      // Actualizamos tanto el índice local como el global
+                      NavigationProvider.setGlobalIndex(index);
+                      navigationProvider.setSelectedIndex(index);
+                    },
                   ),
                 ],
               ),
@@ -99,7 +124,7 @@ class InicioCamaronerasScreen extends StatelessWidget {
     );
   }
 
-  // Construir los elementos de navegación con icono y texto personalizado
+  // Widget para construir los elementos de navegación
   Widget _buildNavItem({
     required IconData icon,
     required String label,
@@ -108,16 +133,14 @@ class InicioCamaronerasScreen extends StatelessWidget {
     required Function(int) onTap,
   }) {
     return InkWell(
-      onTap: () => onTap(index), // Detecta el toque de forma precisa
-      borderRadius:
-          BorderRadius.circular(8), // Añade un borde redondeado opcional
-      splashColor: Colors.transparent, // Elimina el efecto de splash
-      highlightColor: Colors.transparent, // Elimina el efecto de highlight
-      hoverColor: Colors.transparent, // Elimina el efecto de hover
-      focusColor: Colors.transparent, // Elimina el efecto de focus
+      onTap: () => onTap(index),
+      borderRadius: BorderRadius.circular(8),
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+      hoverColor: Colors.transparent,
+      focusColor: Colors.transparent,
       child: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 18), // Ajustar el padding
+        padding: const EdgeInsets.symmetric(horizontal: 18),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -125,16 +148,15 @@ class InicioCamaronerasScreen extends StatelessWidget {
               icon,
               color: selectedIndex == index
                   ? const Color.fromARGB(255, 4, 63, 122)
-                  : const Color.fromARGB(255, 143, 143, 143), // Color del ícono
+                  : const Color.fromARGB(255, 143, 143, 143),
             ),
-            const SizedBox(height: 4), // Ajustar la separación
+            const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 color: selectedIndex == index
                     ? const Color.fromARGB(255, 4, 63, 122)
-                    : const Color.fromARGB(
-                        255, 143, 143, 143), // Color del texto
+                    : const Color.fromARGB(255, 143, 143, 143),
               ),
             ),
           ],

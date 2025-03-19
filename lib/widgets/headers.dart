@@ -2,6 +2,7 @@
 
 import 'dart:math';
 
+import 'package:appnaturisa/helpers/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -69,18 +70,23 @@ class PinkBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Size screenSize = MediaQuery.of(context).size;
     return Transform.rotate(
       angle: -pi / 5,
       child: Container(
-        width: 400,
-        height: 360,
+        width: screenSize.width,
+        // height: 360,
+        height: screenSize.height * 0.45,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(80),
           gradient: LinearGradient(
             colors: [
-              Color(0xFF003366), // Azul oscuro
-              Color(0xFF0073CC), // Azul medio
-              Color(0xFF00A3FF), // Azul claro
+              // Color(0xFF003366), // Azul oscuro
+              // Color(0xFF0073CC), // Azul medio
+              // Color(0xFF00A3FF), // Azul claro
+              AppTheme.primaryBlue,
+              AppTheme.primaryBlue,
+              AppTheme.primaryBlue,
             ],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
@@ -290,10 +296,12 @@ class _HeaderWavePainter extends CustomPainter {
 
     final Gradient gradiente = LinearGradient(
       colors: [
-        Color.fromARGB(255, 4, 63, 122), // Azul oscuro
+        // Color.fromARGB(255, 4, 63, 122), // Azul oscuro
         // Color(0xFF003366), // Azul oscuro
+        AppTheme.primaryBlue,
+        AppTheme.primaryBlue,
 
-        const Color.fromARGB(255, 4, 66, 128),
+        // const Color.fromARGB(255, 4, 66, 128),
         // Color(0xFF00A3FF), // Azul claro
       ],
       begin: Alignment.bottomLeft,
@@ -309,12 +317,12 @@ class _HeaderWavePainter extends CustomPainter {
     final path = Path();
 
     // Dibujar con el path y el lapiz
-    path.lineTo(0, size.height * 0.40);
-    path.quadraticBezierTo(size.width * 0.20, size.height * 0.55,
-        size.width * 0.78, size.height * 0.50);
+    path.lineTo(0, size.height * 0.5);
+    path.quadraticBezierTo(size.width * 0.3, size.height * 0.65,
+        size.width * 0.7, size.height * 0.6);
 
     path.quadraticBezierTo(
-        size.width * 0.95, size.height * 0.50, size.width, size.height * 0.57);
+        size.width * 0.95, size.height * 0.6, size.width, size.height * 0.67);
 
     path.lineTo(size.width, 0);
     canvas.drawPath(path, lapiz);

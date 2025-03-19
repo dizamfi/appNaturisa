@@ -1,3 +1,4 @@
+import 'package:appnaturisa/helpers/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:unique_identifier/unique_identifier.dart';
@@ -141,9 +142,7 @@ class OptionsHelp extends StatelessWidget {
             const SizedBox(
               width: 15,
             ),
-            CircleAvatar(
-                backgroundColor: const Color.fromRGBO(18, 34, 23, 0.859),
-                child: icono),
+            CircleAvatar(backgroundColor: AppTheme.primaryBlue, child: icono),
             const SizedBox(
               width: 15,
             ),

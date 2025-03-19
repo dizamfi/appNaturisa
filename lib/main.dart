@@ -1,7 +1,9 @@
+import 'package:appnaturisa/helpers/theme.dart';
 import 'package:appnaturisa/providers/navigation_provider.dart';
 import 'package:appnaturisa/providers/ps_josefina_provider.dart';
 import 'package:appnaturisa/providers/user_provider.dart';
 import 'package:appnaturisa/screens/camaroneras_screen.dart';
+import 'package:appnaturisa/screens/construccion_screen.dart';
 import 'package:appnaturisa/screens/inicio_camaroneras_screens.dart';
 import 'package:appnaturisa/screens/inicio_screen.dart';
 import 'package:appnaturisa/screens/inicio_sesion_screens.dart';
@@ -77,6 +79,7 @@ import 'package:appnaturisa/screens/josefina/ps/ps55_josefina_screen.dart';
 import 'package:appnaturisa/screens/josefina/ps/ps56_josefina_screen.dart';
 import 'package:appnaturisa/screens/josefina/ps/ps57_josefina_screen.dart';
 import 'package:appnaturisa/screens/josefina/ps/ps58_josefina_screen.dart';
+import 'package:appnaturisa/screens/splash_screen.dart';
 import 'package:appnaturisa/services/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -164,7 +167,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,
         ),
+        // theme: AppTheme.lightTheme,
         debugShowCheckedModeBanner: false,
+        home: SplashScreen(),
         builder: (BuildContext context, Widget? child) {
           return MediaQuery(
             data: MediaQuery.of(context)
@@ -172,7 +177,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             child: child!,
           );
         },
-        initialRoute: 'inicio_sesion_screen',
+        // initialRoute: 'inicio_sesion_screen',
         navigatorKey: navigatorKey,
         scaffoldMessengerKey: messengerKey,
         routes: {
@@ -253,6 +258,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           // Agrega tus demás rutas aquí...
 
           'inicio_camaroneras': ((_) => const InicioCamaronerasScreen()),
+
+          'maricultura_screen': ((_) => const ConstruccionScreen()),
         },
       ),
     );

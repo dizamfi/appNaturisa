@@ -476,7 +476,7 @@ class _PiscinasReporteScreenState extends State<PiscinasReporteScreen> {
   DateTime _selectedDate = DateTime.now();
   bool _isDateSelected = false;
   bool _isPiscinaSelected = false;
-  String _selectedPiscina = "Piscina 22A"; // Piscina predeterminada
+  String _selectedPiscina = "Precria 20"; // Piscina predeterminada
   double trabajoPiscinaOn = 65;
   double trabajoPiscinaOff = 35;
   double usoPromedio = 65;
@@ -484,20 +484,20 @@ class _PiscinasReporteScreenState extends State<PiscinasReporteScreen> {
   bool hasError = false;
 
   dynamic mapeoPiscinas = {
-    'Piscina 22A': 'ps22a',
-    'Piscina 22B': 'ps22b',
-    'Piscina 24': 'ps024',
-    'Piscina 25': 'ps025',
-    'Piscina 26': 'ps026',
-    'Piscina 27': 'ps027',
-    'Piscina 28': 'ps028',
-    'Piscina 29': 'ps029',
-    'Piscina 30': 'ps030',
-    'Piscina 31': 'ps031',
-    'Piscina 32': 'ps032',
-    'Piscina 33A': 'ps33a',
-    'Piscina 33B': 'ps33b',
-    'Piscina 34B': 'ps34b'
+    'Precria 20': 'ps22a',
+    'Precria 101': 'ps22b',
+    'Precria 102': 'ps024',
+    'Precria 103': 'ps025',
+    'Precria 104': 'ps026',
+    'Precria 106': 'ps027',
+    'Precria 107': 'ps028',
+    'Precria 108': 'ps029',
+    'Precria 111': 'ps030',
+    'Precria 113': 'ps031',
+    'Precria 114': 'ps032',
+    'Precria 115': 'ps33a',
+    'Precria 116': 'ps33b',
+    'Precria 117': 'ps34b'
   };
 
   List<double> usoPorHora =
@@ -634,46 +634,59 @@ class _PiscinasReporteScreenState extends State<PiscinasReporteScreen> {
         toolbarHeight: 80,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+        // Reemplazar el title con flexibleSpace
+        flexibleSpace: Stack(
           children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Container(
-                color: Colors.transparent,
-                // height: 200,
-                height: size.height * 0.1,
-                // width: 30,
-                width: size.width * 0.083,
-                child: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: 18,
+            // Título centrado absolutamente en relación a la pantalla
+            Positioned.fill(
+              child: Center(
+                child: Text(
+                  'Reportes',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
+            // Calendario posicionado absolutamente a la derecha
+            Positioned(
+              top: MediaQuery.of(context).padding.top +
+                  15, // Considera el statusbar
+              right: 15, // Margen derecho
+              child: IconButton(
+                onPressed: () {
+                  _selectDate(context);
+                },
+                icon: const Icon(
+                  Icons.calendar_today,
                   color: Colors.black,
                 ),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 50),
-              child: Text(
-                'Reportes',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            IconButton(
-              onPressed: () {
-                _selectDate(context);
-              },
-              icon: const Icon(
-                Icons.calendar_today,
-                color: Colors.black,
-              ),
-            ),
+
+            // // Botón atrás posicionado absolutamente a la izquierda
+            // Positioned(
+            //   top: MediaQuery.of(context).padding.top + 15,
+            //   left: 8,
+            //   child: GestureDetector(
+            //     onTap: () {
+            //       Navigator.pop(context);
+            //     },
+            //     child: Container(
+            //       color: Colors.transparent,
+            //       height: 40,
+            //       width: 40,
+            //       child: const Icon(
+            //         Icons.arrow_back_ios_new_rounded,
+            //         size: 18,
+            //         color: Colors.black,
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -960,8 +973,41 @@ class _PiscinasReporteScreenState extends State<PiscinasReporteScreen> {
             menuMaxHeight: 250,
             value: _selectedPiscina,
             items: <String>[
-              'Piscina 22A',
-              'Piscina 22B',
+              'Precria 20',
+              'Precria 101',
+              'Precria 102',
+              'Precria 103',
+              'Precria 104',
+              'Precria 106',
+              'Precria 107',
+              'Precria 108',
+              'Precria 111',
+              'Precria 113',
+              'Precria 114',
+              'Precria 115',
+              'Precria 116',
+              'Precria 117',
+              'Piscina 01',
+              'Piscina 02',
+              'Piscina 03',
+              'Piscina 04',
+              'Piscina 05',
+              'Piscina 06',
+              'Piscina 07',
+              'Piscina 08',
+              'Piscina 09',
+              'Piscina 10',
+              'Piscina 11',
+              'Piscina 13',
+              'Piscina 14',
+              'Piscina 15',
+              'Piscina 16',
+              'Piscina 17',
+              'Piscina 18',
+              'Piscina 19',
+              'Piscina 21',
+              'Piscina 22',
+              'Piscina 23',
               'Piscina 24',
               'Piscina 25',
               'Piscina 26',
@@ -971,9 +1017,33 @@ class _PiscinasReporteScreenState extends State<PiscinasReporteScreen> {
               'Piscina 30',
               'Piscina 31',
               'Piscina 32',
-              'Piscina 33A',
-              'Piscina 33B',
-              'Piscina 34B'
+              'Piscina 33',
+              'Piscina 34',
+              'Piscina 35',
+              'Piscina 36',
+              'Piscina 37',
+              'Piscina 38',
+              'Piscina 39',
+              'Piscina 40',
+              'Piscina 41',
+              'Piscina 42',
+              'Piscina 43',
+              'Piscina 44',
+              'Piscina 45',
+              'Piscina 46',
+              'Piscina 47',
+              'Piscina 47B',
+              'Piscina 48',
+              'Piscina 49',
+              'Piscina 50',
+              'Piscina 51',
+              'Piscina 52',
+              'Piscina 53',
+              'Piscina 54',
+              'Piscina 55',
+              'Piscina 56',
+              'Piscina 57',
+              'Piscina 58'
             ].map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,

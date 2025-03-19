@@ -433,14 +433,16 @@ class _AntenasInfoStateScreenState extends State<AntenasInfoStateScreen>
           // Extraer la piscina del nombre del tablero (entre "TA" y "-")
           String tableroCompleto = key.split("_")[1];
 
+          // Convertir el valor de string a bool
+          bool status = value == "true";
+
           if (key.contains("PTP") || key.contains("AP")) {
             // Si es un tablero PTP o AP, agrégalo a la lista separada
-            if (value == "false") {
-              specialTableros.add({
-                "nombre": tableroCompleto,
-                "status": false,
-              });
-            }
+            // QUITAR LA CONDICIÓN para mostrar todas, no solo las "false"
+            specialTableros.add({
+              "nombre": tableroCompleto,
+              "status": status,
+            });
           } else {
             // Si no es PTP ni AP, agrúpalo por piscina
             int indexGuion = tableroCompleto.indexOf('-');
@@ -450,12 +452,11 @@ class _AntenasInfoStateScreenState extends State<AntenasInfoStateScreen>
 
             groupedData.putIfAbsent(piscina, () => []);
 
-            if (value == "false") {
-              groupedData[piscina]!.add({
-                "nombre": tableroCompleto,
-                "status": false,
-              });
-            }
+            // QUITAR LA CONDICIÓN para mostrar todas, no solo las "false"
+            groupedData[piscina]!.add({
+              "nombre": tableroCompleto,
+              "status": status,
+            });
           }
         }
       });
@@ -464,7 +465,7 @@ class _AntenasInfoStateScreenState extends State<AntenasInfoStateScreen>
     // Convertir el mapa agrupado a la estructura final
     List<Map<String, dynamic>> result = [];
     groupedData.forEach((piscina, tableros) {
-      // Solo agregar la piscina si al menos un tablero tiene `status: false`
+      // Mostrar todas las piscinas que tengan tableros
       if (tableros.isNotEmpty) {
         result.add({
           "piscina": piscina,
@@ -474,13 +475,13 @@ class _AntenasInfoStateScreenState extends State<AntenasInfoStateScreen>
     });
 
     // Agregar los tableros PTP y AP a la lista de resultados
-    specialTableros.forEach((tablero) {
+    for (var tablero in specialTableros) {
       result.add({
         "piscina":
             tablero["nombre"], // Usar el nombre del tablero como "piscina"
         "tableros": [tablero], // Crear una lista con un solo tablero
       });
-    });
+    }
 
     return result;
   }
